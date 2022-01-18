@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+ <head>
+  <title> New Document </title>
+
+ </head>
+ 
+ <body>
+  
+     <script language="javascript" type="text/javascript">
+        document.write("<hr/>");
+        for (var j=1; j<=2;j++ )
+        {
+
+               var imageURLs = ["830조약돌/조약돌101.jpg",
+                               "830조약돌/조약돌102.jpg",
+                               "830조약돌/조약돌103.jpg",
+                               "830조약돌/조약돌104.jpg",
+                               "830조약돌/조약돌105.jpg",
+                               "830조약돌/조약돌106.jpg",
+                               "830조약돌/조약돌107.jpg",
+                               "830조약돌/조약돌108.jpg",
+                               "830조약돌/조약돌109.jpg",
+                               "830조약돌/조약돌110.jpg",
+                               "830조약돌/조약돌111.jpg",
+                               "830조약돌/조약돌112.jpg",
+                               "830조약돌/조약돌113.jpg",
+                               "830조약돌/조약돌114.jpg",
+                               "830조약돌/조약돌115.jpg",
+                               "830조약돌/조약돌116.jpg",
+                               "830조약돌/조약돌117.jpg",
+                               "830조약돌/조약돌118.jpg",
+                               "830조약돌/조약돌119.jpg",
+                               "830조약돌/조약돌120.jpg",
+                               "830조약돌/조약돌121.jpg",
+                               "830조약돌/조약돌122.jpg",
+                               "830조약돌/조약돌123.jpg",
+                               "830조약돌/조약돌124.jpg",
+                               "830조약돌/조약돌125.jpg",
+                               "830조약돌/조약돌126.jpg",
+                               "830조약돌/조약돌127.jpg",
+                               "830조약돌/조약돌128.jpg",
+                               "830조약돌/조약돌129.jpg",
+                               "830조약돌/조약돌130.jpg",
+                               "830조약돌/조약돌131.jpg",
+                               "830조약돌/조약돌132.jpg",
+                               "830조약돌/조약돌133.jpg",
+                               "830조약돌/조약돌134.jpg",
+                               "830조약돌/조약돌135.jpg",
+                               "830조약돌/조약돌136.jpg",
+                               "830조약돌/조약돌137.jpg",
+                               "830조약돌/조약돌138.jpg",
+                               "830조약돌/조약돌139.jpg",
+                               "830조약돌/조약돌140.jpg",
+                               "830조약돌/조약돌141.jpg",
+                               "830조약돌/조약돌142.jpg",
+                               "830조약돌/조약돌143.jpg",
+                               "830조약돌/조약돌144.jpg"]; 
+
+   
+           function getImageTag() { var img = '<img src=\"'; 
+           var randomIndex = Math.floor(Math.random() * imageURLs.length); 
+                                img += imageURLs[randomIndex]; 
+                                img += '\" alt=\" --->> Something wrong -----> check.... \"/>'; 
+                                return img; } 
+            // 줄바꿈   
+           document.write("");
+           // <<hr> 줄을 긋는 HTML 태그
+           document.write("<hr>");
+         
+           document.write(getImageTag()); 
+         
+           // <br /> 줄바꿈을 의미하는 HTML 태그
+           document.write("<br>");
+           document.write("<hr>");
+
+           setTimeout("location.reload()", 10000);  // location.reload()  10초 후 화면 지우기 성공 
+
+    <audio controls>
+      <source src="조약돌.mp4" type="audio/mpeg">
+  </audio>
+  
+  
+        }
+    </script>
+</body>
+</html>
