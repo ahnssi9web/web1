@@ -1,0 +1,460 @@
+import pandas as pd
+import openpyxl
+from openpyxl.chart import BarChart,LineChart,Series,Reference
+
+import datetime
+from time import sleep
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+
+# ================= 이승준 강사의 설명문 =======================================
+class color:
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+    RED = '\033[91m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    YELLOW = '\033[93m'
+
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+
+    ENDC = '\033[0m'
+
+
+from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Border, Side, Color, PatternFill
+
+# Font: 맑은고딕 크기15 굵게
+font_15 = Font(name='궁서체', size=15, bold=True)
+
+# Alignment; 가로 세로 가운데 정렬
+align_center = Alignment(horizontal='center', vertical='center')
+align_vcenter = Alignment(vertical='center')
+
+# Border 테두리 지정
+border_thin = Border(left=Side(style='thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
+
+# PatternFill 셀 색상 지정
+fill_orange = PatternFill(patternType='solid', fgColor=Color('FFC000'))
+fill_lightgrey = PatternFill(patternType='solid', fgColor=Color('D3D3D3'))
+# ================= 이승준 강사의 설명문 =======================================
+
+now = datetime.datetime.now()
+nowDatetime = now.strftime('%Y-%m-%d')
+# ----------------------------------------------------
+#  챠트 그려넣어 이메일 보낼 파일 불러오기
+newfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop//cfxahn3.xlsx", data_only=True)
+newsheet = newfile['Sheet1']
+
+#  기존 엑셀 파일 불러오기
+file = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/2021-11-01 cfx data.xlsx", data_only=True)
+sheet = file['cfx']
+# ========================================================================================================
+# print(' ---1000')
+# 열단위로 1-100개를 읽어서 rowdata에 넣는다.
+# 새로운 엑셀 파일에 1-4줄로 적기 위해서 간단한 조작을 한다
+# 1번 행에는 날짜를 넣는다 newsheet(2,1)
+# 2번 행에는 보상량을 넣는다 newsheet(2,2)
+# 3번 행에는 관리비를 넣는다 newsheet(2,3)
+# 4번 행에는 실지급량을 넣는다 newsheet(2,4)
+# 5번 행에는 실지급량 누계을 넣는다 newsheet(2,5)
+# 6번 행에는 월보상량을 넣는다 newsheet(2,6)
+# 2행을 읽어 자료를 4줄로 만든 뒤 그것을 챠트를 그려 보고서를 만든다. cfx
+# 화면저장을 A006.png나 111.png로 하여 메일로 보내던지 카톡으로 보낸다.
+
+# 다시 3행에서 같은 작업을 하는 것으로 40행까지 39번을 반복한다.
+i = 5
+j = 0
+# 40개의 서버를 작업한다 col2 (A0006)---> col41(A0045) 40개
+for row in sheet.iter_rows(min_row=5, max_row=5, min_col=4, max_col=34):
+    #print(' ---1:row ---', row)
+    datedata = []
+    i = i + 1
+    j = -1
+    for cell in row:
+        j = j + 1
+        #print(i, '번 저장소   ', j, ' 값 ===>> ', cell.value)
+        datedata.append(cell.value)
+
+    #print('  A0006         >>>> 3 datedata : >>>> ',datedata)
+    newsheet.cell(1, 1).value = '날짜'
+    newsheet.cell(2, 1).value = (datedata[0].strftime('%Y-%m-%d'))  # 9/19
+    newsheet.cell(3, 1).value = (datedata[1].strftime('%Y-%m-%d'))
+    newsheet.cell(4, 1).value = (datedata[2].strftime('%Y-%m-%d'))
+    newsheet.cell(5, 1).value = (datedata[3].strftime('%Y-%m-%d'))
+    newsheet.cell(6, 1).value = (datedata[4].strftime('%Y-%m-%d'))
+    newsheet.cell(7, 1).value = (datedata[5].strftime('%Y-%m-%d'))
+    newsheet.cell(8, 1).value = (datedata[6].strftime('%Y-%m-%d'))
+    newsheet.cell(9, 1).value = (datedata[7].strftime('%Y-%m-%d'))
+    newsheet.cell(10, 1).value = (datedata[8].strftime('%Y-%m-%d'))
+    newsheet.cell(11, 1).value = (datedata[9].strftime('%Y-%m-%d'))
+    newsheet.cell(12, 1).value = (datedata[10].strftime('%Y-%m-%d'))
+    newsheet.cell(13, 1).value = (datedata[11].strftime('%Y-%m-%d'))
+    newsheet.cell(14, 1).value = (datedata[12].strftime('%Y-%m-%d'))
+    newsheet.cell(15, 1).value = (datedata[13].strftime('%Y-%m-%d'))
+    newsheet.cell(16, 1).value = (datedata[14].strftime('%Y-%m-%d'))
+    newsheet.cell(17, 1).value = (datedata[15].strftime('%Y-%m-%d'))
+    newsheet.cell(18, 1).value = (datedata[16].strftime('%Y-%m-%d'))
+    newsheet.cell(19, 1).value = (datedata[17].strftime('%Y-%m-%d'))
+    newsheet.cell(20, 1).value = (datedata[18].strftime('%Y-%m-%d'))
+    newsheet.cell(21, 1).value = (datedata[19].strftime('%Y-%m-%d'))
+    newsheet.cell(22, 1).value = (datedata[20].strftime('%Y-%m-%d'))
+    newsheet.cell(23, 1).value = (datedata[21].strftime('%Y-%m-%d'))
+    newsheet.cell(24, 1).value = (datedata[22].strftime('%Y-%m-%d'))
+    newsheet.cell(25, 1).value = (datedata[23].strftime('%Y-%m-%d'))
+    newsheet.cell(26, 1).value = (datedata[24].strftime('%Y-%m-%d'))
+    newsheet.cell(27, 1).value = (datedata[25].strftime('%Y-%m-%d'))
+    newsheet.cell(28, 1).value = (datedata[26].strftime('%Y-%m-%d'))
+    newsheet.cell(29, 1).value = (datedata[27].strftime('%Y-%m-%d'))
+    newsheet.cell(30, 1).value = (datedata[28].strftime('%Y-%m-%d'))
+    newsheet.cell(31, 1).value = (datedata[29].strftime('%Y-%m-%d'))
+    newsheet.cell(32, 1).value = (datedata[30].strftime('%Y-%m-%d'))
+
+allList = []
+for row in sheet.iter_rows(min_row=6, max_row=6, min_col=1, max_col=50):
+    #print(' ---1:row ---',row)
+    rowdata = []
+    i = i + 1
+    j=-1
+    for cell in row:
+        j = j + 1
+        #print(i,'번 저장소   ',j,' 값 ===>> ', cell.value)
+        rowdata.append(cell.value)
+    allList.append(rowdata)
+    # print('  A0006         >>>> 3 a : >>>> ',a)
+
+
+    # 월누계 자료를 복사해서 붙이므로 앞의 것을 뺴줘야 당일 보상량이 나온다
+    # 월누계	1	   2	     3	      4	     5	6	7	8	9	10	11	12	13	14	15	16	17	18	19	20	21	22	23	24	25	26	27	28	29	30	31	32	                                                                                                                  33	  34	35	    36
+    # 저장소	이름  	email	10/1	10/2	10/3	10/4	10/5	10/6	10/7	10/8	10/9	10/10	10/11	10/12	10/13	10/14	10/15	10/16	10/17	10/18	10/19	10/20	10/21	10/22	10/23	10/24	10/25	10/26	10/27	10/28	10/29	10/30	10/31	어제 합	오늘 합	today
+    # A0006	안상구	9@han	20.24 	37.71	60.38 	83.05	104.89	139.23 	186.33	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0			0
+
+    storageno = rowdata[0]  # 원본 엑셀의 80번 열 -- 위치 잘못지정하면 에러
+    name = rowdata[1]
+    emailid = rowdata[2]
+    today = round(rowdata[36],2)
+    cost = round(rowdata[36]*0.2,2)
+    real = round(rowdata[36]*0.8,2)
+
+    #cfxahn1.xlsx newsheet
+    #  0      1       2      3
+    #날짜    일보상   실지급   월보상계
+    # 10/1  20.24    16.19   20.24
+    #10/2   17.47    30.17   37.71
+    #10/3   22.67    48.30   60.38
+
+
+    newsheet.cell(1, 2).value = '일보상'
+    newsheet.cell(2, 2).value = rowdata[3]
+    newsheet.cell(3, 2).value = rowdata[4]-rowdata[3] if(rowdata[4]>0)  else 0
+    newsheet.cell(4, 2).value = rowdata[5]-rowdata[4] if(rowdata[5]>0)  else 0
+    newsheet.cell(5, 2).value = rowdata[6]-rowdata[5] if(rowdata[6]>0)  else 0
+    newsheet.cell(6, 2).value = rowdata[7]-rowdata[6] if(rowdata[7]>0)  else 0
+    newsheet.cell(7, 2).value = rowdata[8]-rowdata[7] if(rowdata[8]>0)  else 0
+    newsheet.cell(8, 2).value = rowdata[9]-rowdata[8] if(rowdata[9]>0)  else 0
+    newsheet.cell(9, 2).value = rowdata[10]-rowdata[9] if(rowdata[10]>0)  else 0
+    newsheet.cell(10, 2).value = rowdata[11]-rowdata[10] if(rowdata[11]>0)  else 0
+    newsheet.cell(11, 2).value = rowdata[12]-rowdata[11] if(rowdata[12]>0)  else 0
+    newsheet.cell(12, 2).value = rowdata[13]-rowdata[12] if(rowdata[13]>0)  else 0
+    newsheet.cell(13, 2).value = rowdata[14]-rowdata[13] if(rowdata[14]>0)  else 0
+    newsheet.cell(14, 2).value = rowdata[15]-rowdata[14] if(rowdata[15]>0)  else 0
+    newsheet.cell(15, 2).value = rowdata[16]-rowdata[15] if(rowdata[16]>0)  else 0
+    newsheet.cell(16, 2).value = rowdata[17]-rowdata[16] if(rowdata[17]>0)  else 0
+    newsheet.cell(17, 2).value = rowdata[18]-rowdata[17] if(rowdata[18]>0)  else 0
+    newsheet.cell(18, 2).value = rowdata[19]-rowdata[18] if(rowdata[19]>0)  else 0
+    newsheet.cell(19, 2).value = rowdata[20]-rowdata[19] if(rowdata[20]>0)  else 0
+    newsheet.cell(20, 2).value = rowdata[21]-rowdata[20] if(rowdata[21]>0)  else 0
+    newsheet.cell(21, 2).value = rowdata[22]-rowdata[21] if(rowdata[22]>0)  else 0
+    newsheet.cell(22, 2).value = rowdata[23]-rowdata[22] if(rowdata[23]>0)  else 0
+    newsheet.cell(23, 2).value = rowdata[24]-rowdata[23] if(rowdata[24]>0)  else 0
+    newsheet.cell(24, 2).value = rowdata[25]-rowdata[24] if(rowdata[25]>0)  else 0
+    newsheet.cell(25, 2).value = rowdata[26]-rowdata[25] if(rowdata[26]>0)  else 0
+    newsheet.cell(26, 2).value = rowdata[27]-rowdata[26] if(rowdata[27]>0)  else 0
+    newsheet.cell(27, 2).value = rowdata[28]-rowdata[27] if(rowdata[28]>0)  else 0
+    newsheet.cell(28, 2).value = rowdata[29]-rowdata[28] if(rowdata[29]>0)  else 0
+    newsheet.cell(29, 2).value = rowdata[30]-rowdata[29] if(rowdata[30]>0)  else 0
+    newsheet.cell(30, 2).value = rowdata[31]-rowdata[30] if(rowdata[31]>0)  else 0
+    newsheet.cell(31, 2).value = rowdata[32]-rowdata[31] if(rowdata[32]>0)  else 0
+    newsheet.cell(32, 2).value = rowdata[33]-rowdata[32] if(rowdata[33]>0)  else 0
+    # --------------------------------------------------------------------
+    newsheet.cell(1, 3).value = '실지급'
+    newsheet.cell(2, 3).value = newsheet.cell(2, 2).value * 0.8
+    newsheet.cell(3, 3).value = newsheet.cell(3, 2).value * 0.8
+    newsheet.cell(4, 3).value = newsheet.cell(4, 2).value * 0.8
+    newsheet.cell(5, 3).value = newsheet.cell(5, 2).value * 0.8
+    newsheet.cell(6, 3).value = newsheet.cell(6, 2).value * 0.8
+    newsheet.cell(7, 3).value = newsheet.cell(7, 2).value * 0.8
+    newsheet.cell(8, 3).value = newsheet.cell(8, 2).value * 0.8
+    newsheet.cell(9, 3).value = newsheet.cell(9, 2).value * 0.8
+    newsheet.cell(10, 3).value = newsheet.cell(10, 2).value * 0.8
+    newsheet.cell(11, 3).value = newsheet.cell(11, 2).value * 0.8
+    newsheet.cell(12, 3).value = newsheet.cell(12, 2).value * 0.8
+    newsheet.cell(13, 3).value = newsheet.cell(13, 2).value * 0.8
+    newsheet.cell(14, 3).value = newsheet.cell(14, 2).value * 0.8
+    newsheet.cell(15, 3).value = newsheet.cell(15, 2).value * 0.8
+    newsheet.cell(16, 3).value = newsheet.cell(16, 2).value * 0.8
+    newsheet.cell(17, 3).value = newsheet.cell(17, 2).value * 0.8
+    newsheet.cell(18, 3).value = newsheet.cell(18, 2).value * 0.8
+    newsheet.cell(19, 3).value = newsheet.cell(19, 2).value * 0.8
+    newsheet.cell(20, 3).value = newsheet.cell(20, 2).value * 0.8
+    newsheet.cell(21, 3).value = newsheet.cell(21, 2).value * 0.8
+    newsheet.cell(22, 3).value = newsheet.cell(22, 2).value * 0.8
+    newsheet.cell(23, 3).value = newsheet.cell(23, 2).value * 0.8
+    newsheet.cell(24, 3).value = newsheet.cell(24, 2).value * 0.8
+    newsheet.cell(25, 3).value = newsheet.cell(25, 2).value * 0.8
+    newsheet.cell(26, 3).value = newsheet.cell(26, 2).value * 0.8
+    newsheet.cell(27, 3).value = newsheet.cell(27, 2).value * 0.8
+    newsheet.cell(28, 3).value = newsheet.cell(28, 2).value * 0.8
+    newsheet.cell(29, 3).value = newsheet.cell(29, 2).value * 0.8
+    newsheet.cell(30, 3).value = newsheet.cell(30, 2).value * 0.8
+    newsheet.cell(31, 3).value = newsheet.cell(31, 2).value * 0.8
+    newsheet.cell(32, 3).value = newsheet.cell(32, 2).value * 0.8
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    newsheet.cell(1, 4).value = '날짜'
+    newsheet.cell(2, 4).value = newsheet.cell(2, 1).value
+    newsheet.cell(3, 4).value = newsheet.cell(3, 1).value
+    newsheet.cell(4, 4).value = newsheet.cell(4, 1).value
+    newsheet.cell(5, 4).value = newsheet.cell(5, 1).value
+    newsheet.cell(6, 4).value = newsheet.cell(6, 1).value
+    newsheet.cell(7, 4).value = newsheet.cell(7, 1).value
+    newsheet.cell(8, 4).value = newsheet.cell(8, 1).value
+    newsheet.cell(9, 4).value = newsheet.cell(9, 1).value
+    newsheet.cell(10, 4).value = newsheet.cell(10, 1).value
+    newsheet.cell(11, 4).value = newsheet.cell(11, 1).value
+    newsheet.cell(12, 4).value = newsheet.cell(12, 1).value
+    newsheet.cell(13, 4).value = newsheet.cell(13, 1).value
+    newsheet.cell(14, 4).value = newsheet.cell(14, 1).value
+    newsheet.cell(15, 4).value = newsheet.cell(15, 1).value
+    newsheet.cell(16, 4).value = newsheet.cell(16, 1).value
+    newsheet.cell(17, 4).value = newsheet.cell(17, 1).value
+    newsheet.cell(18, 4).value = newsheet.cell(18, 1).value
+    newsheet.cell(19, 4).value = newsheet.cell(19, 1).value
+    newsheet.cell(20, 4).value = newsheet.cell(20, 1).value
+    newsheet.cell(21, 4).value = newsheet.cell(21, 1).value
+    newsheet.cell(22, 4).value = newsheet.cell(22, 1).value
+    newsheet.cell(23, 4).value = newsheet.cell(23, 1).value
+    newsheet.cell(24, 4).value = newsheet.cell(24, 1).value
+    newsheet.cell(25, 4).value = newsheet.cell(25, 1).value
+    newsheet.cell(26, 4).value = newsheet.cell(26, 1).value
+    newsheet.cell(27, 4).value = newsheet.cell(27, 1).value
+    newsheet.cell(28, 4).value = newsheet.cell(28, 1).value
+    newsheet.cell(29, 4).value = newsheet.cell(29, 1).value
+    newsheet.cell(30, 4).value = newsheet.cell(30, 1).value
+    newsheet.cell(31, 4).value = newsheet.cell(31, 1).value
+    newsheet.cell(32, 4).value = newsheet.cell(32, 1).value
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    newsheet.cell(1, 5).value = '일보상 누계'
+    newsheet.cell(2, 5).value = rowdata[3]  # 10/1
+    newsheet.cell(3, 5).value = rowdata[4]  # 10/2
+    newsheet.cell(4, 5).value = rowdata[5]  # 10/3
+    newsheet.cell(5, 5).value = rowdata[6]  # 10/4
+    newsheet.cell(6, 5).value = rowdata[7]
+    newsheet.cell(7, 5).value = rowdata[8]
+    newsheet.cell(8, 5).value = rowdata[9]
+    newsheet.cell(9, 5).value = rowdata[10]
+    newsheet.cell(10, 5).value = rowdata[11]
+    newsheet.cell(11, 5).value = rowdata[12]
+    newsheet.cell(12, 5).value = rowdata[13]
+    newsheet.cell(13, 5).value = rowdata[14]
+    newsheet.cell(14, 5).value = rowdata[15]
+    newsheet.cell(15, 5).value = rowdata[16]
+    newsheet.cell(16, 5).value = rowdata[17]
+    newsheet.cell(17, 5).value = rowdata[18]
+    newsheet.cell(18, 5).value = rowdata[19]
+    newsheet.cell(19, 5).value = rowdata[20]
+    newsheet.cell(20, 5).value = rowdata[21]
+    newsheet.cell(21, 5).value = rowdata[22]
+    newsheet.cell(22, 5).value = rowdata[23]
+    newsheet.cell(23, 5).value = rowdata[24]
+    newsheet.cell(24, 5).value = rowdata[25]
+    newsheet.cell(25, 5).value = rowdata[26]
+    newsheet.cell(26, 5).value = rowdata[27]
+    newsheet.cell(27, 5).value = rowdata[28]
+    newsheet.cell(28, 5).value = rowdata[29]
+    newsheet.cell(29, 5).value = rowdata[30]
+    newsheet.cell(30, 5).value = rowdata[31]
+    newsheet.cell(31, 5).value = rowdata[32]
+    newsheet.cell(32, 5).value = rowdata[33]
+    # --------------------------------------------------------------------
+
+    # --------------------------------------------------------------------
+    newsheet.cell(1, 6).value = '실지급누계'
+    newsheet.cell(2, 6).value = rowdata[3] * 0.8
+    newsheet.cell(3, 6).value = rowdata[4] * 0.8
+    newsheet.cell(4, 6).value = rowdata[5] * 0.8
+    newsheet.cell(5, 6).value = rowdata[6] * 0.8
+    newsheet.cell(6, 6).value = rowdata[7] * 0.8
+    newsheet.cell(7, 6).value = rowdata[8] * 0.8
+    newsheet.cell(8, 6).value = rowdata[9] * 0.8
+    newsheet.cell(9, 6).value = rowdata[10] * 0.8
+    newsheet.cell(10, 6).value = rowdata[11] * 0.8
+    newsheet.cell(11, 6).value = rowdata[12] * 0.8
+    newsheet.cell(12, 6).value = rowdata[13] * 0.8
+    newsheet.cell(13, 6).value = rowdata[14] * 0.8
+    newsheet.cell(14, 6).value = rowdata[15] * 0.8
+    newsheet.cell(15, 6).value = rowdata[16] * 0.8
+    newsheet.cell(16, 6).value = rowdata[17] * 0.8
+    newsheet.cell(17, 6).value = rowdata[18] * 0.8
+    newsheet.cell(18, 6).value = rowdata[19] * 0.8
+    newsheet.cell(19, 6).value = rowdata[20] * 0.8
+    newsheet.cell(20, 6).value = rowdata[21] * 0.8
+    newsheet.cell(21, 6).value = rowdata[22] * 0.8
+    newsheet.cell(22, 6).value = rowdata[23] * 0.8
+    newsheet.cell(23, 6).value = rowdata[24] * 0.8
+    newsheet.cell(24, 6).value = rowdata[25] * 0.8
+    newsheet.cell(25, 6).value = rowdata[26] * 0.8
+    newsheet.cell(26, 6).value = rowdata[27] * 0.8
+    newsheet.cell(27, 6).value = rowdata[28] * 0.8
+    newsheet.cell(28, 6).value = rowdata[29] * 0.8
+    newsheet.cell(29, 6).value = rowdata[30] * 0.8
+    newsheet.cell(30, 6).value = rowdata[31] * 0.8
+    newsheet.cell(31, 6).value = rowdata[32] * 0.8
+    newsheet.cell(32, 6).value = rowdata[33] * 0.8
+
+
+    # --------------------------------------------------------------------
+
+    # --------------------------------------------------------------------
+
+    newsheet.cell(1, 8).value = (str(nowDatetime) + "     " + name + "님!  스토리지 [" + storageno + "]에 참여하심을 감사드립니다.")
+    print(str(nowDatetime), "   ", color.BLUE, color.BOLD, name, " [", storageno, "]   ", color.ENDC, emailid, "  --- ",
+          str(today), "  --- ", str(cost),"  --- ", str(real))
+
+
+# --------------------------------------------------------------------
+# print("------LineChart 챠트그리기 시작 ---------------------")
+# 차트 초기화
+# chart = Barchart()
+chart = LineChart()
+chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+chart.x_axis.title = '2021년 10월'
+chart.y_axis.title = 'CFX'
+
+# x축  A2 (10/1) --- A32(10/31)  --->  y축  자동으로 표시 수치간격
+category = Reference(newsheet, min_col=1, min_row=2, max_row=32)
+chart.set_categories(category)
+
+# 범례 B1(일보상 실지급)+ 데이터 영역 B2:C32  --> B1:C32 (일보상-실지급만 표시하기)
+chartData = Reference(newsheet, min_col=2, min_row=1,   max_col=3,max_row=32)
+# 차트에 데이터 바인딩, title_from_data는 범례 값
+chart.add_data(chartData, titles_from_data=True)
+# ----------------------------------------------------
+# 중간중간 꾸미기 글자키우기 색상 넣기 등
+# --------------------------------------------------------------------
+for row in newsheet['A1:C32']:
+    for cell in row:
+        cell.alignment = align_vcenter
+        cell.fill = fill_lightgrey
+
+for row in newsheet['B2:C32']:
+    for cell in row:
+        cell.border = border_thin
+        cell.number_format = '0.00'
+# ----------------------------------------------------
+# 완성된 챠트를 그리기
+# -----------------------------------------------
+newsheet.add_chart(chart, 'H3')
+# print("------BarChart 챠트그리기 시작 ---------------------")
+# 차트 초기화
+#chart = Barchart()
+
+chart = LineChart()
+chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량 누계"
+chart.x_axis.title = '2021년 10월'
+chart.y_axis.title = 'CFX'
+
+# x축 날짜 D2 (10/1) --- D32(10/31)  --->  y축  자동으로 표시 수치간격
+category = Reference(newsheet, min_col=4, min_row=2, max_row=32)
+chart.set_categories(category)
+
+# 범례 E1(일보상-실지급누계 ) + 데이터 영역 E2:F32  --> E1:F32
+chartData = Reference(newsheet, min_col=5,min_row=1,   max_col=6,max_row=32)
+# 차트에 데이터 바인딩, title_from_data는 범례 값
+chart.add_data(chartData, titles_from_data=True)
+# ----------------------------------------------------
+# 중간중간 꾸미기 글자키우기 색상 넣기 등
+# --------------------------------------------------------------------
+for row in newsheet['D1:F32']:
+    for cell in row:
+        cell.alignment = align_vcenter
+        cell.fill = fill_orange
+
+for row in newsheet['E2:F32']:
+    for cell in row:
+        cell.border = border_thin
+        cell.number_format = '0.00'
+# ----------------------------------------------------
+# 완성된 챠트를 그리기
+# -----------------------------------------------
+newsheet.add_chart(chart, 'H18')
+newfile.save('C:/Users/ahnss/Desktop//cfxahn3.xlsx')
+# ----------------------------------------------------
+# print("------챠트완성하여 cfxahn1.xlsx 저장 ---------------------")
+# ------------------------------------------------------------------------------------
+print(" --- /cfxahn3.xlsx 완성, --> 1초 대기후 메일보내기 ---->> ", name, storageno + ' \n')
+sleep(1)
+# --------------------------------------------------------------------
+
+
+# --------------------------------------------------------------------
+# ----------------------------------------------------
+# 메일 보내기
+# --------------------------------------------------------------------
+# 세션생성, 로그인
+smtpserver = 'smtp.gmail.com:587'
+s = smtplib.SMTP('smtp.gmail.com', 587)
+s.starttls()
+s.login('ahnssi98@gmail.com', 'ivzicifbeckyzwwt')
+
+# 제목, 본문 작성
+msg = MIMEMultipart()
+msg['Subject'] = " ** 오늘의 보상량 : "+str(today)
+msg.attach(MIMEText('  스토리지에 참여하심을 감사드립니다. ', 'plain'))
+
+# 파일첨부 (파일 미첨부시 생략가능)
+attachment = open('C:/Users/ahnss/Desktop//cfxahn3.xlsx', 'rb')
+part = MIMEBase('application', 'octet-stream')
+part.set_payload((attachment).read())
+encoders.encode_base64(part)
+part.add_header('Content-Disposition', 'attachment', filename=('UTF-8', '', 'cfxahn1.xlsx'))
+msg.attach(part)
+
+s = smtplib.SMTP(smtpserver)
+s.starttls()
+s.login('ahnssi98@gmail.com', 'ivzicifbeckyzwwt')
+
+# 메일 전송
+s.sendmail("Yangji Storage Center", emailid, msg.as_string())
+s.quit()
+# ----------------------------------------------------
+# --------------------------------------------------------------------
+
+# ----------------------------------------------------
+print(" --- /cfxahn3.xlsx 메일보내기 완료,  ---> 5초후 다음 사람 ----> ", name, storageno, emailid + ' \n')
+sleep(5)
+# input("2 ------>   엔터를 치세요. ")
+# ----------------------------------------------------
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
+# --------------------------------------------------------------------
