@@ -1,0 +1,442 @@
+import requests
+import datetime
+from time import sleep
+
+import os
+import os.path
+
+import csv
+import json
+import shutil
+
+import openpyxl
+from openpyxl.chart import BarChart,LineChart,Series,Reference
+from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Border, Side, Color, PatternFill
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+
+v = os.path.isfile("C:/Users/ahnss/Desktop/korbit.csv")
+if v == False:
+    f = open("C:/Users/ahnss/Desktop/korbit.csv", mode="w", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    writer.writerow(['nowDatetime', 'type', 'price', 'amount','tid'])
+    print(" make korbit.csv first line --> nowDatetime type  price  amount tid ----")
+    f.close()
+
+v = os.path.isfile("C:/Users/ahnss/Desktop/BTCfile.xlsx")
+if v == False:
+    BTCfile = openpyxl.Workbook()
+    BTCfile.create_sheet()
+    BTCsheet = BTCfile['Sheet']
+    BTCsheet.cell(1, 1).value = 'nowDatetime'
+    BTCsheet.cell(1, 2).value = 'BTCprice'
+    BTCsheet.cell(1, 3).value = 'buycnt100'
+    BTCsheet.cell(1, 4).value = 'buyamt100'
+    BTCsheet.cell(1, 5).value = 'sellcnt100'
+    BTCsheet.cell(1, 6).value = 'sellamt100'
+    BTCsheet.cell(1, 7).value = 'ttlamt100'
+    # ---------------------------------------------------
+    BTCsheet.cell(1, 8).value = 'ahndata'
+    BTCsheet.cell(1, 9).value = 'marketcnt100'
+    BTCsheet.cell(1, 10).value = 'marketamt100'
+    BTCsheet.cell(1, 11).value = 'marketprice100'
+    BTCfile.save('C:/Users/ahnss/Desktop/BTCfile.xlsx')
+    #f = open("C:/Users/ahnss/Desktop/BTC.csv", mode="w", encoding="cp949", newline='')
+    #writer = csv.writer(f)
+    #writer.writerow(['nowDatetime','BTCprice','buycnt', 'buyamt',  'sellcnt', 'sellamt', 'ttlamt','nowDatetime','BTCprice','sellcnt/buycnt','sellamt/buyamt','sellavg/buyavg' )
+    #### writer.writerow(['nowDatetime','BTCprice','buycnt', 'buyamt',  'sellcnt', 'sellamt', 'ttlamt','nowDatetime','BTCprice','sellcnt/buycnt','sellamt/buyamt','sellavg/buyavg' )
+    print(" make BTCfile.xlsx --> nowDatetime marketprice  buycnt buyamt  sellcnt sellamt  ttlamt nowDatetime BTCprice sellcnt/buycnt  sellamt/buyamt  sellavg/buyavg  ")
+    #f.close()
+
+v = os.path.isfile("C:/Users/ahnss/Desktop/graphfile.xlsx")
+if v == False:
+    graphfile = openpyxl.Workbook()
+    graphfile.create_sheet()
+    graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
+    #f = open("C:/Users/ahnss/Desktop/graphfile.xlsx", mode="w", encoding="cp949", newline='')
+    #writer = csv.writer(f)
+    #writer.writerow(['nowDatetime','BTCprice','buycnt', 'buyamt',  'sellcnt', 'sellamt', 'ttlamt','nowDatetime','BTCprice','sellcnt/buycnt','sellamt/buyamt','sellavg/buyavg' )
+    print(" make graphfile.xlsx --> nowDatetime marketprice  buycnt buyamt  sellcnt sellamt  ttlamt nowDatetime BTCprice sellcnt/buycnt  sellamt/buyamt  sellavg/buyavg ")
+    #f.close()
+
+# ---------------------------------------------------
+
+
+# ================= 이승준 강사의 설명문 =======================================
+class color:
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+    RED = '\033[91m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    YELLOW = '\033[93m'
+
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+
+    ENDC = '\033[0m'
+
+
+# Font: 맑은고딕 크기15 굵게
+font_15 = Font(name='궁서체', size=15, bold=True)
+
+# Alignment; 가로 세로 가운데 정렬
+align_center = Alignment(horizontal='center', vertical='center')
+align_vcenter = Alignment(vertical='center')
+
+# Border 테두리 지정
+border_thin = Border(left=Side(style='thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
+
+# PatternFill 셀 색상 지정
+fill_orange = PatternFill(patternType='solid', fgColor=Color('FFC000'))
+fill_lightgrey = PatternFill(patternType='solid', fgColor=Color('D3D3D3'))
+# ================= 이승준 강사의 설명문 =======================================
+
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+while 1:
+    now = datetime.datetime.now()
+    nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+    #print(nowDatetime)  # 2015-04-19 12:11:32
+
+    #-------------------------------------------------------------------------------
+    f = open("C:/Users/ahnss/Desktop/korbit.csv", "a", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    req = requests.get('https://api.korbit.co.kr/v1/transactions')
+    dict = json.loads(req.text)
+    #print(req.text)
+    #-------------------------------------------------------------------------------
+    # korbit data 구조 ---> 여러개를 리스트로 만들어서 저장함
+    #   [{"timestamp":1625969554661,"tid":"11777395","price":"39763000","amount":"0.0001337","type":"buy"},
+    #    {"timestamp":1625969544303,"tid":"11777394","price":"39769000","amount":"0.00099771","type":"buy"},
+    #    {"timestamp":1625969531685,"tid":"11777393","price":"39738000","amount":"0.001","type":"sell"},
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    # 한번 읽어오면 약150-200개 사이임
+    for i in range(1, len(dict)):
+    #for i in range(len(dict), len(dict)):
+        #print(i,len(dict))
+        type = dict[i].get('type')
+        price = dict[i].get('price')
+        amount = dict[i].get('amount')
+        tid = dict[i].get('tid')
+        writer.writerow([nowDatetime, type, price, amount, tid])
+    f.close()
+    sleep(1)
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    # korbit.csv를 열고 데이타를 딕셔너리로 읽어들인다. DictReader
+    #-------------------------------------------------------------------------------
+    #print(nowDatetime,"read  korbit data ------------------> ")
+    f = open('C:/Users/ahnss/Desktop/korbit.csv', 'r')
+    rdr = csv.DictReader(f)
+    # ----------------------------------------------------------
+    buycnt = 0
+    buyprice = 0
+    buyamt = 0
+
+    sellcnt = 0
+    sellprice = 0
+    sellamt = 0
+    ttlamt = 0
+
+    marketcnt = 0
+    marketamt = 0
+    marketprice = 0
+
+    buyavg = 0
+    sellavg = 0
+    buyselldiff = 0
+    ttlline = 0
+    ahnkorbit = []
+    i = -1
+    #----------------------------------------------------------
+    for line in rdr:
+        # print(line)
+        i = i + 1
+        ahnkorbit.append([])
+        ahnkorbit[i].append(line['type'])
+        ahnkorbit[i].append(line['price'])
+        ahnkorbit[i].append(line['amount'])
+        #print(i, " ", ahnkorbit)
+    f.close()
+    #=====================================================
+    ttlline = i + 1
+    ttllinekorbit = ttlline
+    #print()
+    #print(" korbit ttlline = ", ttlline," ", ahnkorbit[ttlline])
+    #==========================================================
+    #==========================================================
+    i = 0
+    # -------------------------------------------------
+    # 10분에 150개씩 읽어온다고 생각되므로 1시간에 1000개 2시간에 2000개 읽어옴
+    # 최근 24시간 동안의 약20000개의 사자와 팔자의 비율이 어떻게 되는지 비교해보자
+    # 최근 5일간 10만개의 자료를 비교해보자
+    #for i in range(1, ttlline):
+    for i in range(ttlline-20000, ttlline):
+        #print(i, " ----- ", ahnkorbit[i])
+        if (ahnkorbit[i][0] == 'buy'):
+            buycnt = buycnt + 1
+            buyprice = buyprice + float(ahnkorbit[i][1])
+            buyamt = buyamt + float(ahnkorbit[i][2])
+            #print("--- buycnt : ", buycnt, " ---- amount = ", line['amount'], " ---- buyamt : ", buyamt)
+        else:
+            sellcnt = sellcnt + 1
+            sellprice = sellprice + float(ahnkorbit[i][1])
+            sellamt = sellamt + float(ahnkorbit[i][2])
+            #print("--- sellcnt : ", sellcnt, " ---- amount = ", line['amount'], " ---- sellamt : ", sellamt)
+    ttlamt = buyamt + sellamt
+    #print("-----------korbit  end of line ---")
+    #print(nowDatetime,"--- 11 korbit  BTC 가격 : ",float(ahnkorbit[i][1]), " 최근 BTC 1000개 buy : ", buycnt, " 수량 : ", buyamt," <<<>>>  sell : ", sellcnt, " 수량 : ", sellamt)
+
+    #=============== 최근 자료 buy sell 주문건수 비교 buy가 많으면 상승장 판단
+    if (buycnt > 0 and sellcnt > 0):
+        buyavg = buyprice / buycnt
+        sellavg = sellprice / sellcnt
+        buyselldiff = buyavg - sellavg
+        marketcnt =  buycnt/sellcnt
+        #print(" ---marketcnt = ", marketcnt,"  sellcnt=", sellcnt, "  buycnt=", buycnt,  "  sellavg=", sellavg,"  buyavg=", buyavg," buyselldiff=",buyselldiff," sellaqg-buyavg=",sellavg - buyavg)
+
+    if (marketcnt > 1.2):
+        result11 = "상승"
+        ahnres11 = 30
+        #print("--- marketcnt 장-----")
+    elif (marketcnt < 1.2 and marketcnt > 0.8):
+        result11 = "보합"
+        ahnres11 = 20
+    #    #print("--- marketcnt 보합-----")
+    else:
+        result11 = "하락"
+        ahnres11 = 10
+    #    #print("--- marketcnt 하락장-----")
+
+    #=============== 최근 자료의 buy sell 주문수량 비교 buy가 많으면 상승장 판단
+    if (buyamt > 0):
+        marketamt =  buyamt/sellamt
+    #--------------------------------------------------------------------------
+    #print(" ---marketamt = ", marketamt, "  buycnt=", buycnt, " buyamt=", buyamt, "  sellcnt=", sellcnt, "   sellamt=", sellamt)
+    if (marketamt > 1.2):
+        result12 = "상상승"
+        ahnres12 = 60
+        #print("--- marketamt 상승장-----")
+    elif (marketamt < 1.2 and marketamt > 0.8):
+        result12 = "보보합"
+        ahnres12 = 40
+        #print("--- marketamt 보합-----")
+    else:
+        result12 = "하하락"
+        ahnres12 = 20
+        #print("--- marketamt 하락장-----")
+    # -----------------------------------------------
+    if buyavg > 0:
+        marketprice = buyavg/sellavg
+        #print(" ---marketprice = ", marketprice*100, "  sellavg=", sellavg, "   buyavg=", buyavg)
+    # ----------------------------------------------------
+    if (marketprice > 1.005):
+        result13 = "상승"
+        ahnres13 = 30
+        #print("--- markeprice 상승장-----")
+    elif (marketprice < 1.005 and marketprice > 0.995):
+        result13 = "보합"
+        ahnres13 = 20
+
+        #print("--- markeprice 보합-----")
+    else:
+        result13 = "하락"
+        ahnres13 = 10
+
+        #print("--- markeprice 하락장-----")
+    # ----------------------------------------------------
+
+    # ----------------------------------------------------
+    ahndata = ahnres11+ahnres12+ahnres13
+    # ----------------------------------------------------
+    # 그래픽용 --- 10,000개를 합산하니 크기가 커서  100으로 나누어 100단위로 만듬
+    #------------------------------------------------------------------
+    BTCprice=(float(ahnkorbit[i][1])) / 1000000
+
+    sellcnt100 = round(sellcnt/100, 1)
+    sellamt100 = round(sellamt/10, 1)
+
+    buycnt100=round(buycnt/100,1)
+    buyamt100=round(buyamt/10,1)
+
+    ttlamt100=round(ttlamt/10,1)
+
+    marketcnt100=round(marketcnt * 100, 0)
+    marketamt100=round(marketamt * 100, 0)
+    marketprice100=round(marketprice * 100, 0)
+
+    # ---------------------------------------------------
+    # ----------------------------------------------------
+    print(ttlline,nowDatetime,"<",ahndata,">",result11, result12, result13, BTCprice," B:", buycnt100, "/", buyamt100," S:", sellcnt100, "/", sellamt100," T:", ttlamt100,"<",ahndata,"> cnt:",marketcnt100,"amt:",marketamt100,"avg:",marketprice100)
+    # ---------------------------------------------------
+
+    # ========================================================================================================
+    #  기존 엑셀 파일 불러와서 100개만 graphfile.xlsx에 저장하고 그래프 만들기
+    BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/BTCfile.xlsx", data_only=True)
+    BTCsheet = BTCfile['Sheet']
+    lenBTCsheet = len(BTCsheet['A'])
+    BTCsheet.cell(lenBTCsheet+1, 1).value = nowDatetime
+    BTCsheet.cell(lenBTCsheet+1, 2).value = BTCprice
+    BTCsheet.cell(lenBTCsheet+1, 3).value = buycnt100
+    BTCsheet.cell(lenBTCsheet+1, 4).value = buyamt100
+    BTCsheet.cell(lenBTCsheet+1, 5).value = sellcnt100
+    BTCsheet.cell(lenBTCsheet+1, 6).value = sellamt100
+    BTCsheet.cell(lenBTCsheet+1, 7).value = ttlamt100
+    # ---------------------------------------------------
+    BTCsheet.cell(lenBTCsheet+1, 8).value = ahndata
+    BTCsheet.cell(lenBTCsheet+1, 9).value = marketcnt100
+    BTCsheet.cell(lenBTCsheet+1, 10).value = marketamt100
+    BTCsheet.cell(lenBTCsheet+1, 11).value = marketprice100
+    BTCfile.save('C:/Users/ahnss/Desktop/BTCfile.xlsx')
+    # ========================================================================================================
+    sleep(1)
+    # ========================================================================================================
+    #  기존 엑셀 파일 불러와서 100개만 graphfile.xlsx에 저장하고 그래프 만들기
+    BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/BTCfile.xlsx", data_only=True)
+    BTCsheet = BTCfile['Sheet']
+    print(" BTCfile-->갯수 : ",len(BTCsheet['A']))
+    lenBTCsheet = len(BTCsheet['A'])
+    #  챠트 그려넣어 이메일 보낼 파일 불러오기
+    graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
+    graphsheet = graphfile['Sheet']
+    # ----------------------------------------------------
+    graphsheet.cell(1, 1).value = 'nowDatetime'
+    graphsheet.cell(1, 2).value = 'BTCprice'
+    graphsheet.cell(1, 3).value = 'buycnt100'
+    graphsheet.cell(1, 4).value = 'buyamt100'
+    graphsheet.cell(1, 5).value = 'sellcnt100'
+    graphsheet.cell(1, 6).value = 'sellamt100'
+    graphsheet.cell(1, 7).value = 'ttlamt100'
+    # ---------------------------------------------------
+    graphsheet.cell(1, 8).value = 'ahndata'
+    graphsheet.cell(1, 9).value = 'marketcnt100'
+    graphsheet.cell(1, 10).value = 'marketamt100'
+    graphsheet.cell(1, 11).value = 'marketprice100'
+
+
+    j=1
+    for i in range(lenBTCsheet-29,lenBTCsheet+1):
+        j=j+1
+        graphsheet.cell(j, 1).value = BTCsheet.cell(i, 1).value
+        graphsheet.cell(j, 2).value = BTCsheet.cell(i, 2).value
+        graphsheet.cell(j, 3).value = BTCsheet.cell(i, 3).value
+        graphsheet.cell(j, 4).value = BTCsheet.cell(i, 4).value
+        graphsheet.cell(j, 5).value = BTCsheet.cell(i, 5).value
+        graphsheet.cell(j, 6).value = BTCsheet.cell(i, 6).value
+        graphsheet.cell(j, 7).value = BTCsheet.cell(i, 7).value
+        graphsheet.cell(j, 8).value = BTCsheet.cell(i, 8).value
+        graphsheet.cell(j, 9).value = BTCsheet.cell(i, 9).value
+        graphsheet.cell(j, 10).value = BTCsheet.cell(i, 10).value
+        graphsheet.cell(j, 11).value = BTCsheet.cell(i, 11).value
+        #print(i,graphsheet.cell(i, 1).value,graphsheet.cell(i, 2).value)
+    graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
+
+    sleep(1)
+
+
+    name = "ahnsangkoo"
+    emailid = "ahnssi9@hanmail.net"
+    #  챠트 그려넣어 이메일 보낼 파일 불러오기
+    graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
+    graphsheet = graphfile['Sheet']
+    print(" graphsheet -->갯수 : ",len(graphsheet['A']))
+    lengraphsheet = len(graphsheet['A'])
+    # --------------------------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    #chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년 1월'
+    chart.y_axis.title = 'KORBIT BTC'
+
+    # --------------------------------------------------------------------
+    # category ---> x축 날짜 표시 A2 :A10  (row=1-10, col=1  --->  y축수치간격은 자동으로 계산됨
+    category = Reference(graphsheet, min_col=1,       min_row=1, max_row=11)
+    chart.set_categories(category)
+    # chartData B1:K100  ---> 범례 B1:K1 + 실제 데아타 영역 B2:K100 (범례는 첫째줄이니 B2:K2 + 데이타는 B2:K100 앞의 두 가지를 합쳐서  B1:k100)
+    chartData = Reference(graphsheet, min_col=2, max_col=11,    min_row=1, max_row=(lengraphsheet))
+    chart.add_data(chartData, titles_from_data=True)  #title_from_data는 범례 값
+    # --------------------------------------------------------------------
+    # -------------------------------------------------------------------
+    # ----------------------------------------------------
+    # 중간중간 꾸미기 글자키우기 색상 넣기 등
+    # --------------------------------------------------------------------
+    for row in graphsheet['F2:F25']:
+        for cell in row:
+            cell.border = border_thin
+            cell.number_format = '0.00'
+
+    for row in graphsheet['C2:C25']:
+        for cell in row:
+            cell.alignment = align_vcenter
+            cell.fill = fill_lightgrey
+
+    for row in graphsheet['B2:B25']:
+        for cell in row:
+            cell.alignment = align_vcenter
+            cell.fill = fill_orange
+    # ----------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphsheet.add_chart(chart, 'M2')
+    # -----------------------------------------------
+    graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
+    # ----------------------------------------------------
+    # print("------챠트완성하여 graphfile.xlsx 저장 ---------------------")
+    # print(" --- 챠트 완성,   1초 대기후 메일보내기 ---->> ")
+    # ------------------------------------------------------------------------------------
+    sleep(1)
+    # --------------------------------------------------------------------
+    if (ahndata>=120 or ahndata <=30):
+        # ----------------------------------------------------
+        # 메일 보내기
+        # --------------------------------------------------------------------
+
+        # 제목, 본문 작성
+        msg = MIMEMultipart()
+        msg['Subject'] = " ** ahndata : "+str(ahndata)+result11+result12+result13
+        msg.attach(MIMEText('  스토리지에 참여하심을 감사드립니다. ', 'plain'))
+
+        # 파일첨부 (파일 미첨부시 생략가능)
+        attachment = open('C:/Users/ahnss/Desktop/graphfile.xlsx', 'rb')
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment', filename=('UTF-8', '', 'graphfile.xlsx'))
+        msg.attach(part)
+
+        # 세션생성, 로그인
+        smtpserver = 'smtp.gmail.com:587'
+        s = smtplib.SMTP(smtpserver)
+        s.starttls()
+        s.login('ahnssi98@gmail.com', 'fcwwkgkglatjqwhx')
+
+        # 메일 전송
+        s.sendmail("   Center", emailid, msg.as_string())
+        s.quit()
+        # ----------------------------------------------------
+        print(" ---   메일보내기  ----> "," ahndata:",ahndata,result11,result12,result13," ",name,  emailid + ' \n')
+        sleep(5)
+    # ----------------------------------------------------
+    #print(" --- 작업끝    600초 대기 ---->> ")
+    sleep(600)
+# --------------------------------------------------------------------
+

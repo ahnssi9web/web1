@@ -1,0 +1,541 @@
+﻿import requests
+import datetime
+from time import sleep
+import csv
+import os.path
+import json
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+
+#import matplotlib.pyplot as plt
+#import numpy as np
+#import pandas as pd
+
+plotcnt = 5
+mailcnt = 5
+    # ----------------------------------------------------
+
+    # ----------------------------------------------------
+
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/korbit.csv")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/korbit.csv", mode="w", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    writer.writerow(['nowDatetime', 'type', 'price', 'amount'])
+    print(" make korbit.csv first line --> nowDatetime type  price  amount ----")
+    f.close()
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/bithumb.csv")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/bithumb.csv", mode="w", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    writer.writerow(['nowDatetime','opening_price','closing_price','min_price','max_price'])
+    print(" make bithumb.csv first line --> nowDatetime opening_price closing_price min_price max_price  ----")
+    f.close()
+
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/BTC.csv")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/BTC.csv", mode="w", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    writer.writerow(['nowDatetime','BTCprice',  'buycnt', 'buyamt',  'sellcnt', 'sellamt', 'newamt'])
+    print(" make BTC.csv first line --> nowDatetime marketprice  buycnt buyamt  sellcnt sellamt  newamt ---")
+    f.close()
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/ahn39.csv")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/ahn39.csv", mode="w", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    writer.writerow(['nowDatetime', 'buycnt', 'sellcnt', 'marketcnt', 'buyamt',  'sellamt', 'marketamt', 'amtdiff','sellavg', 'buyavg',  'marketprice',  'avgnew', 'avgold', 'avgrate','avgdiff','maxclose','minopen', 'ahnres11', 'ahnres12', 'ahnres13', 'ahnres14', 'ahnres21', 'ahnres31', 'ahnres32', 'ahnres33'])
+    print(" make ahn39.csv first line --> nowDatetime buycnt sellcnt marketcnt---")
+    f.close()
+
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/ahn39.txt")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/ahn39.txt", mode="w", encoding="cp949", newline='')
+    p = "nowDatetime buycnt /ahnssi9/sellcnt marketcnt buyamt  sellamt marketamt sellavg buyavg  marketprice buyselldiff avgnew avgold avgrate avgdiff\n"
+    f.write(p)
+    print(" make ahn39.txt first line --> nowDatetime buycnt sellcnt marketcnt buyamt  sellamt marketamt sellavg buyavg marketprice buyselldiff avgnew avgold avgrate avgdiff")
+    f.close()
+
+    # ----------------------------------------------------
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/API.txt")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/ahn39.txt", mode="w", encoding="cp949", newline='')
+    p = "nowDatetime buycnt /ahnssi9/sellcnt marketcnt buyamt  sellamt marketamt sellavg buyavg  marketprice buyselldiff avgnew avgold avgrate avgdiff\n"
+    f.write(p)
+    print(
+        " 메일 보내기 성공 \n")
+    f.close()
+# ----------------------------------------------------
+p = "  ---------------- restart ----------------------------------  \n"
+with open("C:/Users/ahnssi9/Desktop/ahn39.txt", mode="a", encoding="cp949") as f:
+    f.write(p)
+# ---------------------------------------------------
+# ---------------------------------------------------
+# ---------------------------------------------------
+# ---------------------------------------------------
+# ---------------------------------------------------
+while 1:
+    now = datetime.datetime.now()
+    nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+    #print(nowDatetime)  # 2015-04-19 12:11:32
+
+    #-------------------------------------------------------------------------------
+    f = open("C:/Users/ahnssi9/Desktop/korbit.csv", "a", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    req = requests.get('https://api.korbit.co.kr/v1/transactions')
+    dict = json.loads(req.text)
+    #print(req.text)
+    #-------------------------------------------------------------------------------
+    # korbit data 구조 ---> 여러개를 리스트로 만들어서 저장함
+    #   [{"timestamp":1625969554661,"tid":"11777395","price":"39763000","amount":"0.0001337","type":"buy"},
+    #    {"timestamp":1625969544303,"tid":"11777394","price":"39769000","amount":"0.00099771","type":"buy"},
+    #    {"timestamp":1625969531685,"tid":"11777393","price":"39738000","amount":"0.001","type":"sell"},
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #  결국 데이타 처리방법이 bithumb과 다름  10개만 저장하자
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #for i in range(1, len(dict)):
+    for i in range(len(dict) - 10, len(dict)):
+        #print(i,len(dict))
+        type = dict[i].get('type')
+        price = dict[i].get('price')
+        amount = dict[i].get('amount')
+        tid = dict[i].get('tid')
+        writer.writerow([nowDatetime, type, price, amount, tid])
+    f.close()
+    sleep(1)
+    #-------------------------------------------------------------------------------
+    f = open("C:/Users/ahnssi9/Desktop/bithumb.csv", "a", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    btc = requests.get("https://api.bithumb.com/public/ticker/").json()['data']
+    #print(btc.text)
+    #-------------------------------------------------------------------------------
+    #   bithumb data 구조 ---> 한 개를 딕셔너리로 보냄
+    #    {"status":"0000","data":{"opening_price":"39918000","closing_price":"39744000","min_price":"39160000","max_price":"40258000",
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #  결국 데이타 처리방법이 korbit과 다름  10개만 저장하자
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    #for i in range(1, len(btc)):
+    for i in range( len(btc)-10, len(btc)):
+        #print(i,len(btc))
+        opening_price = float(btc['opening_price'])
+        closing_price = float(btc['closing_price'])
+        min_price = float(btc['min_price'])
+        max_price = float(btc['max_price'])
+        # print(i,len(btc),"write bitumb data--------> ",nowDatetime, opening_price,closing_price,min_price,max_price,market)
+        writer.writerow([nowDatetime, opening_price, closing_price, min_price, max_price])
+    f.close()
+    sleep(1)
+    #-------------------------------------------------------------------------------
+    # korbit.csv를 열고 데이타를 딕셔너리로 읽어들인다. DictReader
+    #-------------------------------------------------------------------------------
+    #print(nowDatetime,"read  korbit data ------------------> ")
+    f = open('C:/Users/ahnssi9/Desktop/korbit.csv', 'r')
+    rdr = csv.DictReader(f)
+    # ----------------------------------------------------------
+    buycnt = 0
+    buyprice = 0
+    buyamt = 0
+
+    sellcnt = 0
+    sellprice = 0
+    sellamt = 0
+
+    marketcnt = 0
+    marketamt = 0
+    marketprice = 0
+
+    buyavg = 0
+    sellavg = 0
+    buyselldiff = 0
+    ttlline = 0
+    ahnkorbit = []
+    i = -1
+    #----------------------------------------------------------
+    for line in rdr:
+        # print(line)
+        i = i + 1
+        ahnkorbit.append([])
+        ahnkorbit[i].append(line['type'])
+        ahnkorbit[i].append(line['price'])
+        ahnkorbit[i].append(line['amount'])
+        #print(i, " ", ahnkorbit)
+    f.close()
+    #=====================================================
+    # print(0, " ", ahnkorbit[0])
+    # print(34, " open=",ahnkorbit[34][0])
+    ttlline = i + 1
+    ttllinekorbit = ttlline
+    #print()
+    #print(" korbit ttlline = ", ttlline," ", ahnkorbit[ttlline])
+    #==========================================================
+    #==========================================================
+    #  최근 자료 1주일치 15만개  buy별 자료 sell별 자료를 비교하기
+    #==========================================================
+    #==========================================================
+    i = 0
+
+
+    # -------------------------------------------------
+    # 10분에 100개씩 읽어온다고 생각되므로 1시간에 600개 2시간에 1200개 읽어옴
+    # 최근 2시간 동안에 약1000개의 사자와 팔자의 비율이 어떻게 되는지 비교해보자
+    for i in range(ttlline-200, ttlline):
+        #print(i, " ----- ", ahnkorbit[i])
+        if (ahnkorbit[i][0] == 'buy'):
+            buycnt = buycnt + 1
+            buyprice = buyprice + float(ahnkorbit[i][1])
+            buyamt = buyamt + float(ahnkorbit[i][2])
+            #print("--- buycnt : ", buycnt, " ---- amount = ", line['amount'], " ---- buyamt : ", buyamt)
+        else:
+            sellcnt = sellcnt + 1
+            sellprice = sellprice + float(ahnkorbit[i][1])
+            sellamt = sellamt + float(ahnkorbit[i][2])
+            #print("--- sellcnt : ", sellcnt, " ---- amount = ", line['amount'], " ---- sellamt : ", sellamt)
+
+    #print("-----------korbit  end of line ---")
+    #print(nowDatetime,"--- 11 korbit  BTC 가격 : ",float(ahnkorbit[i][1]), " 최근 BTC 1000개 buy : ", buycnt, " 수량 : ", buyamt," <<<>>>  sell : ", sellcnt, " 수량 : ", sellamt)
+
+    #=============== 최근 자료 buy sell 주문건수 비교 buy가 많으면 상승장 판단
+    if (buycnt > 0 and sellcnt > 0):
+        buyavg = buyprice / buycnt
+        sellavg = sellprice / sellcnt
+        buyselldiff = sellavg - buyavg
+        marketcnt =  sellcnt/buycnt
+        #print(" ---marketcnt = ", marketcnt, "  buycnt=", buycnt, "  sellcnt=", sellcnt," buyselldiff=",buyselldiff)
+
+    if (marketcnt > 1.2):
+        result11 = "상승"
+        ahnres11 = 3
+        #print("--- marketcnt 상승장-----")
+    elif (marketcnt < 1.2 and marketcnt > 0.8):
+        result11 = "보합"
+        ahnres11 = 0
+    #    #print("--- marketcnt 보합-----")
+    else:
+        result11 = "하락"
+        ahnres11 = -3
+    #    #print("--- marketcnt 하락장-----")
+
+    #=============== 최근 자료 300개의 buy sell 주문수량 비교 buy가 많으면 상승장 판단
+    # -----------------------------------------------
+    #print(" ---marketamt = ", marketamt, "  buyamt=", buyamt, "  sellamt=", sellamt)
+    #if (buycnt > 0) :
+    #    buyamt = buyamt / buycnt
+    #if (sellcnt > 0):
+    #    sellamt = sellamt / sellcnt
+    if (buyamt > 0):
+        marketamt =  sellamt/buyamt
+    #--------------------------------------------------------------------------
+    #print(" ---marketamt = ", marketamt, "  buycnt=", buycnt, " buyamt=", buyamt, "  sellcnt=", sellcnt, "   sellamt=", sellamt)
+    if (marketamt > 1.2):
+        result12 = "상승"
+        ahnres12 = 3
+        #print("--- marketamt 상승장-----")
+    elif (marketamt < 1.2 and marketamt > 0.8):
+        result12 = "보합"
+        ahnres12 = 0
+        #print("--- marketamt 보합-----")
+    else:
+        result12 = "하락"
+        ahnres12 = -3
+        #print("--- marketamt 하락장-----")
+    # -----------------------------------------------
+
+
+    #=============== 최근 자료 300개의 buy sell 주문가격 비교 sell/buy > 1.75면 상승장 판단
+    if buyavg > 0:
+        marketprice = sellavg/buyavg
+        #print(" ---marketprice = ", marketprice, "  sellavg=", sellavg, "   buyavg=", buyavg)
+    # ----------------------------------------------------
+    if (marketprice > 1.005):
+        result13 = "상승"
+        ahnres13 = 3
+        #print("--- markeprice 상승장-----")
+    elif (marketprice < 1.005 and marketprice > 0.995):
+        result13 = "보합"
+        ahnres13 = 0
+
+        #print("--- markeprice 보합-----")
+    else:
+        result13 = "하락"
+        ahnres13 = -3
+
+        #print("--- markeprice 하락장-----")
+    # ----------------------------------------------------
+
+    # ----------------------------------------------------
+    if (buyselldiff > 1000000):
+        result14 = "상승"
+        ahnres14 = 3
+
+        #print("---14: buyselldiff 상승장-----",result14)
+    elif (buyselldiff < 1000000 and buyselldiff > -1000000):
+        result14 = "보합"
+        ahnres14 = 0
+        #print("--- 14: buyselldiff 보합-----",result14)
+    else:
+        result14= "하락"
+        ahnres14 = -3
+        #print("--- 14: buyselldiff 하락장-----",result14)
+    # ----------------------------------------------------
+    #==========================================================
+    #==========================================================
+    #  10일전 15만개  최근10분간 1000개 비교하기
+    #==========================================================
+    #==========================================================
+    # ----------------------------------------------------------
+    i = 0
+    oldamt = 0
+    newamt = 0
+    amtdiff = 0
+    # 코빗의 경우 1분10개 1시간600개 1일 1440*10=15000개 10일 15만개
+    #cnt2week = 160001
+    #cntoldno = 150000  #  10일 15만개
+    #cntoldstart = ttlline - cnt2week
+    #cntoldend = cntoldstart + cntoldno
+
+    #cnt1day = 1001
+    #cntnewno = 1000 #최근 10분간 1000개
+    #cntnewstart = ttlline - cnt1day
+    #cntnewend = cntnewstart + cntnewno
+    # -------------------------------------------------
+    # 10분에 100개씩 읽어온다고 생각되므로 1시간에 600개 2시간에 1200개 읽어옴
+    # 최근 2시간 동안에 약1000개의 사자와 팔자의 비율이 어떻게 되는지 비교해보자
+    cnt2week = 1200
+    cntoldno = 100
+    cntoldstart = ttlline - cnt2week
+    cntoldend = cntoldstart + cntoldno
+
+    cnt1day = 100
+    cntnewno = 100
+    cntnewstart = ttlline - cnt1day
+    cntnewend = cntnewstart + cntnewno
+    # -------------------------------------------------
+    for i in range(cntoldstart,cntoldend):
+        oldamt = oldamt + float(ahnkorbit[i][2])
+    for i in range(cntnewstart, cntnewend):
+        newamt = newamt + float(ahnkorbit[i][2])
+    print(nowDatetime,"    Korbit  BTC :",float(ahnkorbit[i][1]), "     최근200개  buy:", buycnt, "/", round(buyamt,2)," sell:", sellcnt, "/", round(sellamt,2), "      최근 100개 :", round(newamt,2),"/2hr전 :", round(oldamt,2))
+    # ----------------------------------------------------
+    p = str(nowDatetime)+" "+str(float(ahnkorbit[i][1]))+" "+str(buycnt)+" "+str(buyamt)+" "+str(sellcnt)+" "+str(sellamt)+" "+str(newamt)+" "+str(oldamt)
+    #with open("C:/Users/ahnssi9/Desktop/BTC.csv", mode="a", encoding="cp949") as f:
+    #    f.write(p)
+    # ---------------------------------------------------
+    # ----------------------------------------------------
+    # 그래픽용
+    BTCprice=(float(ahnkorbit[i][1])) / 10000000
+    buycnt100=round(buycnt/10,2)
+    buyamt100=round(buyamt*10,2)
+
+    sellcnt100= round(sellcnt/10,2)
+    sellamt100= round(sellamt*10,2)
+
+    newamt100=round(newamt*10,2)
+    # ----------------------------------------------------
+    with open("C:/Users/ahnssi9/Desktop/BTC.csv", mode="a", encoding="cp949", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([nowDatetime,BTCprice, buycnt100, buyamt100, sellcnt100, sellamt100, newamt100])
+    # ---------------------------------------------------
+    oldamt = oldamt / cntoldno
+    newamt = newamt / cntnewno
+    #print("--- 22 ---- BTC 100개 평균값   oldamt : ", oldamt, " ---- newamt = ", newamt)
+    amtdiff = newamt - oldamt
+    if (amtdiff > 0.05):
+        result21 = "상승"
+        ahnres21 = 3
+        #print("--- amtdiff 상승장-----")
+    elif (amtdiff < 0.05 and amtdiff > -0.05):
+        result21 = "보합"
+        ahnres21 = 0
+        #print("--- amtdiff 보합-----")
+    else:
+        result21 = "하락"
+        ahnres21 = -3
+        #print("--- amtdiff 하락장-----")
+
+    # ----------------------------------------------------
+    # ==============================================================================
+    # -----bithumb.csv---------------------------------------
+    # ==============================================================================
+    bithumb = []
+    cntnow = 0
+    totalold = 0
+    totalnew = 0
+    avgold = 0
+    avgnew = 0
+    avgdiff = 0
+    avgrate = 0
+    buyavgratio = 0
+    sellavgratio = 0
+    maxcloseold = 0
+    minopenold = 0
+    maxclosenew = 0
+    minopennew = 0
+    maxclosexxx = 0
+    minopenxxx = 0
+    maxcloseratio = 0
+    minopenratio = 0
+    #==============================================================================
+    f = open('C:/Users/ahnssi9/Desktop/bithumb.csv', 'r')
+    rdr = csv.reader(f)
+    ttlline = sum(1 for row in rdr)
+    #print("------21---- read  bithumb data  ttlline=", ttlline)
+    f.close()
+    #==============================================================================
+    # ----------------------------------------------------
+    #==========================================================
+    #bithumb의 경우  # 1분10개 1시간 600개 1일 14400개 1주일 10만개 2주일 20만개  2주일전에서 1주전까지
+    #==============================================================================
+    f = open('C:/Users/ahnssi9/Desktop/bithumb.csv', 'r')
+    rdr = csv.reader(f)
+    for line in rdr:
+        bithumb.append(line)
+    f.close()
+    #print(bithumb)
+    #print("-----23 ------ bithumb data is entered in bithumb[] list ----")
+   # ==========================================================
+    # bithumb의 경우  # 1분10개 1시간 600개 1일 14400개
+    #  10일전 15만개와  최근10분간 1000개 비교하기
+    # ==========================================================
+    # cnt2week = 160001
+    # cntoldno = 150000
+    # ==========================================================
+    # bithumb의 경우  # 10분100개 1시간 600개 2시간에 1200개
+    # 2시간전 100개와 지금의 100개 비교해보자
+    #==========================================================
+    cnt2week = 1200
+    cntoldno = 100
+
+    cntoldstart = ttlline - cnt2week
+    cntoldend = cntoldstart + cntoldno
+
+    cnt1day = 100
+    cntnewno = 100  # 최근 100개 1분10개 10분100개
+    cntnewstart = ttlline - cnt1day
+    cntnewend = cntnewstart + cntnewno
+    #==============================================================================
+    cntnow = cntoldstart
+    #print(" ttlline=", ttlline, "  - cntoldstart : ", cntoldstart, " cntnow : ", cntnow)
+    # ---- 지난 자료 중 200개의 종가의 평균을 구하라 --------
+    for i in range(cntoldstart, cntoldend):
+
+        #print(" ttlline=", ttlline, "  - cntnow : ", cntnow, "   --- bithumb[cntnow][1] : ", bithumb[cntnow])
+        totalold = totalold + float(bithumb[cntnow][2])
+        #print(bithumb[cntnow][0], " ", bithumb[cntnow][1], " ", bithumb[cntnow][2], " ", bithumb[cntnow][3], " ",bithumb[cntnow][4])
+        cntnow = cntnow + 1   # 위로 보내지마시용
+        # ----------------------------------------------------
+
+    avgold = totalold / cntoldno
+    #print(" ttlline=",ttlline,"  cntnow : ", cntnow, " - bithumb[cntnow] : ", bithumb[cntnow][1], " === total : ", total,"  === avgold : ", avgold)
+
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    cntnow = 0
+    totalnew = 0
+    cntnow = cntnewstart
+    #print("  row_cnt : ", row_cnt, "  -- cnt1day  : ", cnt1day, "  ---- cnt now : ", cntnow)
+    for i in range(cntnewstart,cntnewend):
+        totalnew = totalnew + float(bithumb[i][2])
+        # print(" cntnow : ", cntnow, "  -- bithumb[cntnow][1] : ", bithumb[cntnow][2], " ===> total : ", total)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        #print("  ---- cnt now : ", cntnow,"  ", bithumb[cntnow][1]," <> ", bithumb[cntnow][2], " ")
+        # ----------------------------------------------------
+        if (bithumb[cntnow][1] < bithumb[cntnow][2]):
+            maxclosexxx = float(bithumb[cntnow][4]) - float(bithumb[cntnow][2])
+            if (maxclosexxx > maxclosenew) :
+                maxclosenew = maxclosexxx
+                #print(" --03-- ", cntnow, " open: ", bithumb[cntnow][1], " < close: ", bithumb[cntnow][2], "  max-close=", maxclosenew)
+        if (bithumb[cntnow][1] > bithumb[cntnow][2]):
+            minopenxxx = float(bithumb[cntnow][1]) - float(bithumb[cntnow][3])
+            if (minopenxxx > minopennew) :
+                minopennew = minopenxxx
+                #print(" --04-- ", cntnow, " open: ", bithumb[cntnow][1], " > close: ", bithumb[cntnow][2], "  open-min=", minopennew)
+        cntnow = cntnow + 1    # 위로 보내지마시용
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    avgnew = totalnew / cntnewno
+    #print(" cntnow : ", cntnow, "  === totalnew : ", totalnew,"  === avgnew : ", avgnew)
+    if (avgold > 0):
+        avgrate = avgnew / avgold
+    avgdiff = avgnew - avgold
+    #print(" 비율 avgrate=", avgrate, " avgnew= ", avgnew, " avgold= ", avgold," avgdiff=",avgdiff)
+
+
+    #=============== 지난 자료 200개의 종가 평균이 최근 자료 100개의 평균보다 > 1.75면 상승장 판단
+    if (avgrate > 1.2):
+        result31 = "상승"
+        ahnres31 = 3
+        #print("========== 상승장 ==> 비율 avgrate=", avgrate, "  avgnew= ", avgnew, " avgold= ", avgold)
+    elif (avgrate < 1.2 and avgrate > 0.8):
+        result31 = "보합"
+        ahnres31 = 0
+        #print("--- 보합-----")
+    else:
+        result31 = "하락"
+        ahnres31 = -3
+        #print(" 하락장 ------> 비율 avgrate=", avgrate, "  avgnew= ", avgnew, " avgold= ", avgold)
+
+    #=============== 지난 자료 200개의 종가 평균이 최근 자료 100개의 평균보다 > 1.75면 상승장 판단
+
+    # ----------------------------------------------------
+    if (avgdiff > 1000000):
+        result32 = "상승"
+        ahnres32 = 3
+        #print("--- avgdiff 상승장-----")
+    elif (avgdiff < 1000000 and avgdiff > -1000000):
+        result32 = "보합"
+        ahnres32 = 0
+        #print("--- avgdiff 보합-----")
+    else:
+        result32 = "하락"
+        ahnres32 = -3
+        #print("--- avgdiff 하락장-----")
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    # =============== 급락 급등 찾기
+    # ----------------------------------------------------
+    result33 = "------ "
+    ahnres33 = 0
+    if (maxcloseold > 1000000) :
+        result33 = "Sell처리"
+        ahnres33 = 5
+        #print("---  위꼬리 Sell처리 -----")
+    if (minopenold > 1000000) :
+        result33 = "Buy처리"
+        ahnres33 = -5
+        #print("--- 아래꼬리 Buy처리 -----")
+    #print(" ",row_cnt," ",nowDatetime, "  ", result33, "   max=",round(maxclosenew,0), "/",round(maxcloseold,0), "=",round(maxcloseratio,2),"  min=",round(minopennew,0),"/",round(minopenold,0)," =",round(minopenratio,2))
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    print(ttllinekorbit,ttlline," ",nowDatetime, " (", result11, result12, result13, result14, ") (", result21, ")  (", result31, result32,result33, ")  10일 B/S:(", buycnt, "/",
+          sellcnt, ":", round(marketcnt, 2), ")  (", round(buyamt, 2), "/", round(sellamt, 2), " :",round(marketamt, 2), ") avg[", round(sellavg, 0), "/", round(buyavg, 0), ":",
+          round(marketprice, 2)," :",round(buyselldiff,0),"] result21:amtnew/old(", round(newamt, 2), "/", round(oldamt, 2), " :",round(amtdiff,2),"  Bithumb 31:avgnew={", round(avgnew, 0), "/", round(avgold, 0), ":", round(avgrate, 2),
+          "  ",round(avgdiff,0),"} < maxclose(",round(maxclosenew,0), " minopen(",round(minopennew,0))
+    # ----------------------------------------------------
+    #print(ttllinekorbit,ttlline,nowDatetime," (",result11,result12,result13,result14,") (",result21,") (",result31,result32,result33,") 7일 B/S:(", round(buycnt, 0), "/", round(sellcnt, 0), ") (", round(buyamt, 0), "/", round(sellamt, 0),") (",round(buyavg, 0),"/",round(sellavg, 0),") ----(", round(avgold, 0), "/", round(avgnew, 0), ") (",round(maxcloseold,0), "/", round(maxclosenew, 0), ") (",round(minopenold, 0),"/",round(minopennew, 0),") ")
+    #
+    #
+    #
+    # ----------------------------------------------------
+    p = str(nowDatetime)+"  7일 B/S("+str(result11)+" "+str(result12)+"  "+str(result13)+""+str(result14)+") 7일/10시간("+str(result21)+") 빗썸 7일/10시간("+str(result31)+"  "+str(result32)+" "+str(result33)+" "+str(result33)+")  (buycnt:"+str(buycnt)+"/sellcnt:"+str(sellcnt)+"-->"+str(round(marketcnt,2))+")  (buyamt:"+str(round(buyamt,0))+"/sellamt:"+str(round(sellamt,0))+"-->"+str(round(marketamt,2))+") (newamt="+str(round(newamt,4))+" oldamt="+str(round(oldamt,4))+" newamt-oldamt="+str(round(amtdiff,4))+"  [sellavg:"+str(round(sellavg,0))+"/buyavg:"+str(round(buyavg,0))+"-->"+str(round(marketprice,2))+" sell-buy="+str(round(buyselldiff,0))+"]  {avgnew:"+str(round(avgnew,0))+"/avgold:"+str(round(avgold,0))+"-->"+str(round(avgrate,2))+"  avgdiff="+str(round(avgdiff,0))+"  ==>  maxclosenew=" + str(round(maxclosenew, 0)) + "   ==>  minopennew="+str(round(minopennew,0))+"}\n"
+    with open("C:/Users/ahnssi9/Desktop/ahn39.txt", mode="a", encoding="cp949") as f:
+        f.write(p)
+    # ---------------------------------------------------
+    sleep(600)
