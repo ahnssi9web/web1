@@ -42,9 +42,9 @@ if v == False:
     BTCfile.create_sheet()
     BTCSheet = BTCfile['Sheet']
     BTCSheet.cell(1, 1).value = 'nowDatetime'
-    BTCSheet.cell(1, 2).value = 'BTCpriceNow'
-    BTCSheet.cell(1, 3).value = 'BTCprice'
-    BTCSheet.cell(1, 4).value = 'BTCprice200'
+    BTCSheet.cell(1, 2).value = 'BTCpriceNowper'
+    BTCSheet.cell(1, 3).value = 'BTCpriceper'
+    BTCSheet.cell(1, 4).value = 'BTCprice200per'
     BTCSheet.cell(1, 5).value = 'buycnt100'
     BTCSheet.cell(1, 6).value = 'buyamt100'
     BTCSheet.cell(1, 7).value = 'buyvg00'
@@ -61,6 +61,26 @@ if v == False:
     BTCSheet.cell(1, 17).value = 'result11'
     BTCSheet.cell(1, 18).value = 'result12'
     BTCSheet.cell(1, 19).value = 'result13'
+
+    # ---------------------------------------------------
+    BTCSheet.cell(1, 20).value = 'nowDatetime'
+    BTCSheet.cell(1, 21).value = 'BTCpriceNow'
+    BTCSheet.cell(1, 22).value = 'BTCprice'
+    BTCSheet.cell(1, 23).value = 'BTCprice100per'
+    BTCSheet.cell(1, 24).value = 'buycnt'
+    BTCSheet.cell(1, 25).value = 'buyamt'
+    BTCSheet.cell(1, 26).value = 'buyavg'
+    BTCSheet.cell(1, 27).value = 'sellcnt'
+    BTCSheet.cell(1, 28).value = 'sellamt'
+    BTCSheet.cell(1, 29).value = 'sellavg'
+    BTCSheet.cell(1, 30).value = 'ttlamt'
+    BTCSheet.cell(1, 31).value = 'marketcntper'
+    BTCSheet.cell(1, 32).value = 'marketamtper'
+    BTCSheet.cell(1, 33).value = 'marketpriceper'
+    BTCSheet.cell(1, 34).value = 'ahndatattl'
+    BTCSheet.cell(1, 35).value = 'ahndataahn'
+    # ---------------------------------------------------
+
     BTCfile.save('C:/Users/ahnssi9/Desktop/BTCfile.xlsx')
     #f = open("C:/Users/ahnssi9/Desktop/BTC.csv", mode="w", encoding="cp949", newline='')
     #writer = csv.writer(f)
@@ -229,7 +249,7 @@ while 1:
     # 최근 24시간 동안의 약20000개의 사자와 팔자의 비율이 어떻게 되는지 비교해보자
     # 최근 5일간 10만개의 자료를 비교해보자
     #for i in range(1, ttlline):
-    for i in range(ttlline-40, ttlline):
+    for i in range(ttlline-400, ttlline):
         #print(i, " ----- ",ahnkorbit[i][0],"=====", ahnkorbit[i])
         if (ahnkorbit[i][0] == 'buy'):
             buycnt = buycnt + 1
@@ -320,9 +340,11 @@ while 1:
     # ----------------------------------------------------
     # 그래픽용 --- 10,000개를 합산하니 크기가 커서  100으로 나누어 100단위로 만듬
     #------------------------------------------------------------------
-    BTCpriceNow = round(float((BTCpriceNow/100000)), 1)
-    BTCprice = round(float((BTCprice/100000)), 1)
+    BTCpriceNow = round(float((BTCpriceNow/10000)), 0)
+    BTCprice = round(float((BTCprice/10000)), 0)
+    BTCprice100per	= int(BTCpriceNow/BTCprice*100)
     BTCprice200	= int(BTCpriceNow/BTCprice*100)
+
     #print("--- BTCpriceNow : ", BTCpriceNow, " ---- BTCprice = ", BTCprice, " ---- BTCprice200 : ", BTCprice200)
     # --------------------------------------------------------------------
     if (BTCprice200>=105 or BTCprice200<=95):
@@ -344,6 +366,9 @@ while 1:
             p = nowDatetime +" =======> check  BTCprice :"+str(BTCpriceNow)+" / "+str(BTCprice)+" = "+str(BTCprice200) + " \n"
             f.write(p)
             # -----------------------------------------------
+        # ========================================================================================================
+
+        # ========================================================================================================
 
         # --------------------------------------------------------------------
     buycnt100 = int(buycnt/1)
@@ -361,6 +386,23 @@ while 1:
 
     #ttlamt100 = int(ttlamt/1)
     ttlamt100 = buyamt100 + sellamt100
+
+
+    buyavg= round(float(buyavg/10000), 0)
+    sellavg= round(float(sellavg/10000), 0)
+
+
+    buyamt= round(float(buyamt), 2)
+    sellamt= round(float(sellamt), 2)
+    ttlamt = buyamt + sellamt
+    ttlamt = round(float(ttlamt),2)
+
+    ahndatattl = int(ahndata100)
+    marketcntper = int(marketcnt*100)
+    marketamtper = int(marketamt*100)
+    marketpriceper = int(marketprice*100)
+    ahndataahn = ahndata
+
     ahndata100 = int(ahndata100)-300
     marketcnt100 = int(marketcnt*100)
     marketamt100 = int(marketamt*10)
@@ -380,11 +422,12 @@ while 1:
     #  ahndata100  200-800
     #  ahndata       0-400
     #
-    BTCpriceNow = (BTCpriceNow-300)/(900-300)*100
-    BTCprice = (BTCprice-300)/(900-300)*100
-    BTCprice200 = (BTCprice200-50)/(200-50)*100
-    #buycnt100 = (buycnt100-0)/(400-0)*100
-    #sellcnt100 = (sellcnt100-0)/(400-0)*100
+    BTCpriceNowper = (BTCpriceNow-300)/(900-300)*10
+    BTCpriceper = (BTCprice-300)/(900-300)*10
+    BTCprice200per = (BTCprice200-0)/(1000-0)*100
+
+    buycnt100 = (buycnt100-0)/(400-0)*100
+    sellcnt100 = (sellcnt100-0)/(400-0)*100
 
     buyamt100 = (buyamt100-100)/(500-0)*100
     sellamt100 = (sellamt100-100)/(500-0)*100
@@ -407,9 +450,11 @@ while 1:
 
     # ========================================================================================================
 
-    BTCpriceNow = int(BTCpriceNow)
-    BTCprice = int(BTCprice)
-    BTCprice200 = int(BTCprice200)
+    BTCpriceNowper = int(BTCpriceNowper)
+    BTCpriceper = int(BTCpriceper)
+    BTCprice100per = int(BTCprice100per)
+    BTCprice200per = int(BTCprice200per)
+
     buycnt100 = int(buycnt100)
     sellcnt100 = int(sellcnt100)
 
@@ -436,9 +481,9 @@ while 1:
     BTCSheet = BTCfile['Sheet']
     lenBTCSheet = len(BTCSheet['A'])
     BTCSheet.cell(lenBTCSheet+1, 1).value = nowDatetime
-    BTCSheet.cell(lenBTCSheet+1, 2).value = BTCpriceNow
-    BTCSheet.cell(lenBTCSheet+1, 3).value = BTCprice
-    BTCSheet.cell(lenBTCSheet+1, 4).value = BTCprice200
+    BTCSheet.cell(lenBTCSheet+1, 2).value = BTCpriceNowper
+    BTCSheet.cell(lenBTCSheet+1, 3).value = BTCpriceper
+    BTCSheet.cell(lenBTCSheet+1, 4).value = BTCprice100per
     BTCSheet.cell(lenBTCSheet+1, 5).value = buycnt100
     BTCSheet.cell(lenBTCSheet+1, 6).value = buyamt100
     BTCSheet.cell(lenBTCSheet+1, 7).value = buyavg100
@@ -455,6 +500,23 @@ while 1:
     BTCSheet.cell(lenBTCSheet+1, 17).value = result11
     BTCSheet.cell(lenBTCSheet+1, 18).value = result12
     BTCSheet.cell(lenBTCSheet+1, 19).value = result13
+    BTCSheet.cell(lenBTCSheet+1, 20).value = nowDatetime
+    BTCSheet.cell(lenBTCSheet+1, 21).value = BTCpriceNow
+    BTCSheet.cell(lenBTCSheet+1, 22).value = BTCprice
+    BTCSheet.cell(lenBTCSheet+1, 23).value = BTCprice100per
+    BTCSheet.cell(lenBTCSheet+1, 24).value = buycnt
+    BTCSheet.cell(lenBTCSheet+1, 25).value = buyamt
+    BTCSheet.cell(lenBTCSheet+1, 26).value = buyavg
+    BTCSheet.cell(lenBTCSheet+1, 27).value = sellcnt
+    BTCSheet.cell(lenBTCSheet+1, 28).value = sellamt
+    BTCSheet.cell(lenBTCSheet+1, 29).value = sellavg
+    BTCSheet.cell(lenBTCSheet+1, 30).value = ttlamt
+    # ---------------------------------------------------
+    BTCSheet.cell(lenBTCSheet+1, 31).value = marketcntper
+    BTCSheet.cell(lenBTCSheet+1, 32).value = marketamtper
+    BTCSheet.cell(lenBTCSheet+1, 33).value = marketpriceper
+    BTCSheet.cell(lenBTCSheet+1, 34).value = ahndatattl
+    BTCSheet.cell(lenBTCSheet+1, 35).value = ahndataahn
     BTCfile.save('C:/Users/ahnssi9/Desktop/BTCfile.xlsx')
     # ========================================================================================================
     sleep(1)
@@ -476,9 +538,9 @@ while 1:
     # ----------------------------------------------------
     # ----------------------------------------------------
     graphSheet.cell(1, 1).value = 'nowDatetime'
-    graphSheet.cell(1, 2).value = 'BTCpriceNow'
-    graphSheet.cell(1, 3).value = 'BTCprice'
-    graphSheet.cell(1, 4).value = 'BTCprice200'
+    graphSheet.cell(1, 2).value = 'BTCpriceNowper'
+    graphSheet.cell(1, 3).value = 'BTCpriceper'
+    graphSheet.cell(1, 4).value = 'BTCprice200per'
     graphSheet.cell(1, 5).value = 'buycnt100'
     graphSheet.cell(1, 6).value = 'buyamt100'
     graphSheet.cell(1, 7).value = 'buyavg100'
@@ -496,6 +558,22 @@ while 1:
     graphSheet.cell(1, 18).value = 'result12'
     graphSheet.cell(1, 19).value = 'result13'
     # ---------------------------------------------------
+    graphSheet.cell(1, 20).value = 'nowDatetime'
+    graphSheet.cell(1, 21).value = 'BTCpriceNow'
+    graphSheet.cell(1, 22).value = 'BTCprice'
+    graphSheet.cell(1, 23).value = 'BTCprice100per'
+    graphSheet.cell(1, 24).value = 'buycnt'
+    graphSheet.cell(1, 25).value = 'buyamt'
+    graphSheet.cell(1, 26).value = 'buyavg'
+    graphSheet.cell(1, 27).value = 'sellcnt'
+    graphSheet.cell(1, 28).value = 'sellamt'
+    graphSheet.cell(1, 29).value = 'sellavg'
+    graphSheet.cell(1, 30).value = 'ttlamt'
+    graphSheet.cell(1, 31).value = 'marketcntper'
+    graphSheet.cell(1, 32).value = 'marketamtper'
+    graphSheet.cell(1, 33).value = 'marketpriceper'
+    graphSheet.cell(1, 34).value = 'ahndatattl'
+    graphSheet.cell(1, 35).value = 'ahndataahn'
     # ---------------------------------------------------
     j = 1
     graphcnt = 40
@@ -520,6 +598,22 @@ while 1:
         graphSheet.cell(j, 17).value = BTCSheet.cell(i, 17).value
         graphSheet.cell(j, 18).value = BTCSheet.cell(i, 18).value
         graphSheet.cell(j, 19).value = BTCSheet.cell(i, 19).value
+        graphSheet.cell(j, 20).value = BTCSheet.cell(i, 20).value
+        graphSheet.cell(j, 21).value = BTCSheet.cell(i, 21).value
+        graphSheet.cell(j, 22).value = BTCSheet.cell(i, 22).value
+        graphSheet.cell(j, 23).value = BTCSheet.cell(i, 23).value
+        graphSheet.cell(j, 24).value = BTCSheet.cell(i, 24).value
+        graphSheet.cell(j, 25).value = BTCSheet.cell(i, 25).value
+        graphSheet.cell(j, 26).value = BTCSheet.cell(i, 26).value
+        graphSheet.cell(j, 27).value = BTCSheet.cell(i, 27).value
+        graphSheet.cell(j, 28).value = BTCSheet.cell(i, 28).value
+        graphSheet.cell(j, 29).value = BTCSheet.cell(i, 29).value
+        graphSheet.cell(j, 30).value = BTCSheet.cell(i, 30).value
+        graphSheet.cell(j, 31).value = BTCSheet.cell(i, 31).value
+        graphSheet.cell(j, 32).value = BTCSheet.cell(i, 32).value
+        graphSheet.cell(j, 33).value = BTCSheet.cell(i, 33).value
+        graphSheet.cell(j, 34).value = BTCSheet.cell(i, 34).value
+        graphSheet.cell(j, 35).value = BTCSheet.cell(i, 35).value
         #print(i,graphSheet.cell(i, 1).value,graphSheet.cell(i, 2).value)
     graphfile.save('C:/Users/ahnssi9/Desktop/graphfile.xlsx')
     graphfile.close()
@@ -535,13 +629,15 @@ while 1:
     #print(" graphSheet -->갯수 : ",len(graphSheet['A']))
     lengraphSheet = len(graphSheet['A'])
     # ----------------------------------------------------
-    print(ttlline,lenBTCSheet,lengraphSheet, nowDatetime,BTCpriceNow,BTCprice,"<",BTCprice200,">--<B/S>", buycnt100, buyamt100,"avg:", buyavg100,"/", sellcnt100, sellamt100,
-          "avg:",sellavg100, "<T>", ttlamt100, "--<%>", marketcnt100, marketamt100, marketprice100, "--<",
-          ahndata100,ahndata,">", result11, result12, result13)
+    print(ttlline,lenBTCSheet,lengraphSheet, nowDatetime,"/",BTCpriceNow,"/",BTCprice,"<",BTCprice100per,"> B:", buycnt,"/", buyamt,"/", buyavg," S:", sellcnt,"/", sellamt,"/",
+          sellavg, " T:", ttlamt, " %:", marketcntper,"/", marketamtper,"/", marketpriceper, " <",
+          ahndatattl,"/",ahndataahn,"> ", nowDatetime,"/",BTCpriceNowper,"/",BTCpriceper,"<",BTCprice100per,"> B:", buycnt100, "/",buyamt100,"/", buyavg100," S:", sellcnt100, "/",sellamt100,
+          sellavg100, " T:", ttlamt100, " %:", marketcnt100,"/", marketamt100, "/",marketprice100, " <",
+          ahndata100,"/",ahndata,">", result11, result12, result13)
     # ---------------------------------------------------
     # ----------------------------------------------------
     with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-        p = str(ttlline) + " " + str(lenBTCSheet) + " " + str(lengraphSheet) + " " + nowDatetime + " " + str(BTCpriceNow) + " " + str(BTCprice) + " " + "<" + str(BTCprice200) + ">--<B/S>" + " " + str(buycnt100) + " " + str(buyamt100) + " " + "avg:" + " " + str(buyavg100) + " " + "/" + " " + str(sellcnt100) + " " + str(sellamt100) + "avg:" + " " + str(sellavg100) + " " + "<T>" + " " + str(ttlamt100) + " " + "--<%>" + " " + str(marketcnt100) + " " + str(marketamt100) + " " + str(marketprice100)+" " + "--<" + str(ahndata100) + " " + str(ahndata)+ ">" + result11 + " " + result12 + " " + result13 + " \n"
+        p = str(ttlline) + " " + str(lenBTCSheet) + " " + str(lengraphSheet) + " " + nowDatetime + " " + str(BTCpriceNow) + " " + str(BTCprice) + " " + str(BTCprice100per) + " B: " + str(buycnt) + " " + str(buyamt) + " " + str(buyavg) + " S: " + str(sellcnt) + " " + str(sellamt) + " " + str(sellavg) + " T: " + str(ttlamt) + " %:" + str(marketcntper) + " " + str(marketamtper) + " " + str(marketpriceper)+" " + str(ahndatattl) + " || " + str(ahndataahn)+ " " + result11 + " " + result12 + " " + result13 + " \n"
         f.write(p)
         # -----------------------------------------------
     # --------------------------------------------------------------------
