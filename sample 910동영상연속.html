@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+ <head>
+  <title> New Document </title>
+ </head>
+  <body>
+     <script language="javascript" type="text/javascript">
+        for (var j=1; j<=1;j++ )
+        {        
+		var videos = [
+					  ];  
+
+
+		window.onload = function () {
+			    var playerDiv = document.getElementById("random_player");
+			    var player = document.createElement("IFRAME");
+			    var randomVideoUrl = videos[Math.floor(Math.random() * videos.length)];
+			    player.setAttribute('width', '600');
+			    player.setAttribute('height','300');
+			    player.setAttribute('src', randomVideoUrl);
+			    playerDiv.appendChild(player);
+        }; 
+ 		// 줄바꿈   
+		document.write("");
+  		// <br /> 줄바꿈을 의미하는 HTML 태그
+		document.write("<br>");
+		document.write("<hr>");
+		// <br /> 줄바꿈을 의미하는 HTML 태그
+		document.write("<br>");
+		document.write("<hr>");
+		
+		document.write("<p ");
+		document.write("id = 'random_player'>");
+		//document.write("---ahn1 random_player  ---");
+		document.write("</p>");
+  		// <br /> 줄바꿈을 의미하는 HTML 태그
+		document.write("<br>");
+		document.write("<hr>");
+ 		setTimeout("location.reload()", 200000);  // location.reload()  200초 3분 후 화면 지우기 성공 
+		
+  		// <br /> 줄바꿈을 의미하는 HTML 태그
+		document.write("<br>");
+		document.write("<hr>");
+  }
+     </script>
+ </body>
+</html>

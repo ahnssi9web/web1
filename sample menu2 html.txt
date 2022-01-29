@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+     <title> ahn39 github homepage </title>  
+ 	<meta charset="utf-8"/>
+	<style>
+	   img {
+		  border: 1px solid #ddd;
+		  border-radius: 4px;
+		  padding: 5px;
+		  width: 300px;
+		  height : 300px;
+	 	  border-radius: 50%; 
+	       }
+	</style>			 
+			 
+</head>
+
+<body> 
+
+
+      <img src="제주도취소/방배동 코로나 대책.png">
+      <video controls autoplay witdh="400px" src="제주도취소/상록수.mp4"></video><br><br>
+      <a href="스리집/갈마동.txt">갈마동.txt</a><br><br>		 
+      <a href="제주도취소/코로나 대책.pdf">코로나 대책.pdf</a><br><br>                       
+  </body>
+</html>
