@@ -923,9 +923,11 @@ while 1:
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
     # ------------------------------------------------------------------------------------
-
-
+    sleepsec = 600  # 10분
+    if (now.hour >= 21 and now.hour <= 24):
+        sleepsec = 1800 #  30분
+    if (now.hour >= 0 and now.hour <= 6):
+        sleepsec = 3600 #  1시간
     # ----------------------------------------------------
-    #print(" --- 작업끝 1시간   3600초 대기 ---->> ")
-    sleep(600)
+    sleep(sleepsec)
 # --------------------------------------------------------------------
