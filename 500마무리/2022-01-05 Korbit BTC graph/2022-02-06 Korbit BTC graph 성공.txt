@@ -300,24 +300,23 @@ while 1:
     ttlamt = buyamt + sellamt
     #print("--- BTCpriceNow : ", BTCpriceNow, " ---- BTCprice = ", BTCprice, " ---- ")
     BTCprice = BTCpricettl / (buycnt + sellcnt)
-    #BTCdiff =   BTCpriceNow - BTCprice
-    BTCpriceNow = round(float((BTCpriceNow))/10000, 0)
-    BTCprice = round(float((BTCprice))/10000, 0)
+    # ---------------------------------------------------
+    BTCpriceNow = round(float((BTCpriceNow)) / 10000, 0)
+    BTCprice = round(float((BTCprice)) / 10000, 0)
     BTCpriceNow = int(BTCpriceNow)
     BTCprice = int(BTCprice)
     BTCdiff = BTCpriceNow - BTCprice
-
+    # BTCdiff =   BTCmaxprice - BTCminprice
+    # BTCdiff = round(float(BTCdiff), 0)
+    BTCdiff = int(BTCdiff)
+    BTCdiffold = 0 # 아래에서 나옴
+    # ---------------------------------------------------
     BTCmaxprice = round(float((BTCmaxprice)) / 10000, 0)
     BTCminprice = round(float((BTCminprice)) / 10000, 0)
-    BTCdiff = round(float((BTCdiff)) / 10000, 0)
-
-    # ---------------------------------------------------
     BTCmaxprice = int(BTCmaxprice)
     BTCminprice = int(BTCminprice)
-    #BTCdiff =   BTCmaxprice - BTCminprice
-    #BTCdiff = round(float(BTCdiff), 0)
-    BTCdiff = int(BTCdiff)
-    #print(ahndate1 ,ahndate2 , " =======> check   BTCmaxprice :", BTCmaxprice, " = ", BTCminprice,  "BTCdiff=", BTCdiff)
+    # ---------------------------------------------------
+    #print(ahndate1, ahndate2, " =======> ", BTCpriceNow, "   ", BTCprice, "   BTCmaxprice :", BTCmaxprice, " = ", BTCminprice, " BTCdiff=", BTCdiff," BTCdiffold=", BTCdiffold)
     # ---------------------------------------------------
     # ---------------------------------------------------
     #print("-----------korbit  end of line ---")
@@ -507,13 +506,18 @@ while 1:
         graphSheet.cell(j, 26).value = BTCSheet.cell(i, 26).value  # result12
         graphSheet.cell(j, 27).value = BTCSheet.cell(i, 27).value  # date
 
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
     marketcntold = graphSheet.cell(graphcnt, 15).value
     marketamtold = graphSheet.cell(graphcnt, 16).value
     marketperold = graphSheet.cell(graphcnt, 17).value
     ttlamtold = graphSheet.cell(graphcnt, 13).value
     BTCdiffold = graphSheet.cell(graphcnt, 23).value
-
-
+    # ---------------------------------------------------
+    #print(ahndate1, ahndate2, " =======> ", BTCpriceNow, "   ", BTCprice, "   BTCmaxprice :", BTCmaxprice, " = ", BTCminprice, " BTCdiff=", BTCdiff," BTCdiffold=", BTCdiffold)
+    # ---------------------------------------------------
+    # ---------------------------------------------------
     ahncntper = marketcnt / marketcntold * 100
     ahnamtper = marketamt / marketamtold * 100
     ahnperper = marketper / marketperold * 100
@@ -528,11 +532,13 @@ while 1:
     graphSheet.cell(graphcnt+1, 20).value =  ahnamtper
     graphSheet.cell(graphcnt+1, 21).value =  ahnttlper
     graphSheet.cell(graphcnt+1, 22).value =  ahnperper
+    # ---------------------------------------------------
+    # ---------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
     BTCfile.close()
     sleep(1)
-    #print(i, lenBTCSheet, " percent 증가율 검토 : cnt=",marketcnt, marketcntold, ahncntper,"  amt=",marketamt, marketamtold, ahnamtper,"  per=",marketper, marketperold, ahnperper)
+    #print(i, lenBTCSheet,"  BTCdiff=", BTCdiff,BTCdiffold," percent 증가율 검토 : cnt=",marketcnt, marketcntold, ahncntper,"  amt=",marketamt, marketamtold, ahnamtper,"  per=",marketper, marketperold, ahnperper)
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # 알림 1
