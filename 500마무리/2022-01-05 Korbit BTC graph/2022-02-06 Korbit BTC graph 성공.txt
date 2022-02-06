@@ -528,10 +528,10 @@ while 1:
     ahnttlper = int(ahnttlper)
     ahnperper = int(ahnperper)
 
-    graphSheet.cell(graphcnt+1, 19).value =  ahncntper
-    graphSheet.cell(graphcnt+1, 20).value =  ahnamtper
-    graphSheet.cell(graphcnt+1, 21).value =  ahnttlper
-    graphSheet.cell(graphcnt+1, 22).value =  ahnperper
+    graphSheet.cell(graphcnt+1, 19).value =  ahncntper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
+    graphSheet.cell(graphcnt+1, 20).value =  ahnamtper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
+    graphSheet.cell(graphcnt+1, 21).value =  ahnttlper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
+    graphSheet.cell(graphcnt+1, 22).value =  ahnperper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
     # ---------------------------------------------------
     # ---------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
