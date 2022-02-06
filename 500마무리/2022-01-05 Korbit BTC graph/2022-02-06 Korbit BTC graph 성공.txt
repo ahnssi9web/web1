@@ -514,6 +514,7 @@ while 1:
     marketperold = graphSheet.cell(graphcnt, 17).value
     ttlamtold = graphSheet.cell(graphcnt, 13).value
     BTCdiffold = graphSheet.cell(graphcnt, 23).value
+    BTCdiffoldold = graphSheet.cell(graphcnt-1, 23).value
     # ---------------------------------------------------
     #print(ahndate1, ahndate2, " =======> ", BTCpriceNow, "   ", BTCprice, "   BTCmaxprice :", BTCmaxprice, " = ", BTCminprice, " BTCdiff=", BTCdiff," BTCdiffold=", BTCdiffold)
     # ---------------------------------------------------
@@ -546,14 +547,15 @@ while 1:
     # --------------------------------------------------------------------    # --------------------------------------------------------------------
     #if (BTCdiff >=100 or BTCdiff <= -100):
     #if (BTCpriceNow-BTCprice >=200 or BTCpriceNow-BTCprice <= -200 or (Btcdiff>0 and Btcdiffold<0) or (Btcdiff<0 and Btcdiffold>0)):
-    if (BTCpriceNow - BTCprice >= 200 or BTCpriceNow - BTCprice <= -200 or (BTCdiff > 0 and BTCdiffold < 0) or (
-                BTCdiff < 0 and BTCdiffold > 0)):
-        print(ahndate1 ,ahndate2 , " =======> check Now-avg>=200 or Now-avg<=-200  BTCdiff change --> (", BTCpriceNow, "  ", BTCprice, " BTCmax=", BTCmaxprice,
-              " min=", BTCminprice, "   BTCdiff=",BTCdiff,"    BTCdiffold=",BTCdiffold)
+    #if (BTCpriceNow - BTCprice >= 200 or BTCpriceNow - BTCprice <= -200 or (BTCdiff > 0 and BTCdiffold < 0) or (
+    #            BTCdiff < 0 and BTCdiffold > 0)):
+    if ((BTCdiff > 0 and BTCdiffold < 0 and BTCdiffold-BTCdiffoldold >10) or (
+                BTCdiff < 0 and BTCdiffold > 0 and BTCdiffold-BTCdiffold < -10)):
+        print(ahndate1 ,ahndate2 , " =======>  BTCdiff=",BTCdiff,"    BTCdiffold=",BTCdiffold,"    BTCdiffoldold=",BTCdiffoldold,"    BTCdiffold-BTCdiffold=",BTCdiffold-BTCdiffold)
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  =======> check  Now-avg>=200 or Now-avg<=-200   BTCdiff change --> (" + str(BTCpriceNow) + " " + str(BTCprice) + "  Max=" + str(
-                BTCmaxprice) + " Min=" + str(BTCminprice) +"  BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+") " + "  \n"
+            p = ahndate1 + " " + ahndate2 + "  =======>  BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+"   BTCdiffoldold="+str(BTCdiffoldold)+"    BTCdiffold-BTCdiffold="+str(BTCdiffold-BTCdiffold)
+        # ----------------------------------------------------") " + "  \n"
             f.write(p)
         # -----------------------------------------------
         # ----------------------------------------------------
@@ -655,14 +657,14 @@ while 1:
     #  lengraphSheet 아용하여 각종 자료 출력하기
     # ---------------------------------------------------
     # ----------------------------------------------------
-    print(ahndate1,ahndate2,"  BTC(", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, " ",BTCdiff,":",BTCdiffold, ")  cnt(", buycnt,
-          "/", sellcnt, "=", marketcnt," ", ahncntper,"%)  amt(", buyamt, "/", sellamt, "=", marketamt," ", ahnamtper, "%)  T%=(" ,marketper," ", ahnperper,"%)  Tamt=(",
+    print(ahndate1,ahndate2," BTC(", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, " ",BTCdiff,":",BTCdiffold, ") (",BTCdiffoldold," ",BTCdiffold-BTCdiffoldold,") cnt(", buycnt,
+          "/", sellcnt, "=", marketcnt," ", ahncntper,"%)  amt(", buyamt, "/", sellamt, "=", marketamt," ", ahnamtper, "%) T%=(" ,marketper," ", ahnperper,"%) Tamt=(",
           ttlamt,ahnttlper,"%) <",ahnresult,"% ", result11, result12,">")
     # ---------------------------------------------------
-    # ----------------------------------------------------
+    # ---------------------------------------------------
     with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-        p = ahndate1+" "+ ahndate2+" BTC(" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +" "+str(BTCdiff)+":"+str(BTCdiffold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
-            marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)   T%=(" + str(marketper)+ " " + str(ahnperper) + "%) Tamt=( " + str(
+        p = ahndate1+" "+ ahndate2+" BTC(" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +" "+str(BTCdiff)+":"+str(BTCdiffold)+") "+str(BTCdiffoldold)+" "+str(BTCdiffold-BTCdiffoldold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+            marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)  T%=(" + str(marketper)+ " " + str(ahnperper) + "%) Tamt=( " + str(
             ttlamt)+ " " + str(ahnttlper) + "%) <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
         f.write(p)
     # -----------------------------------------------
