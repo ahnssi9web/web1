@@ -553,7 +553,7 @@ while 1:
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
             p = ahndate1 + " " + ahndate2 + "  =======> check  Now-avg>=200 or Now-avg<=-200   BTCdiff change --> (" + str(BTCpriceNow) + " " + str(BTCprice) + "  Max=" + str(
-                BTCmaxprice) + " Min=" + str(BTCminprice) +"  BTCdiff="+BTCdiff+"    BTCdiffold="+BTCdiffold+") " + "  \n"
+                BTCmaxprice) + " Min=" + str(BTCminprice) +"  BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+") " + "  \n"
             f.write(p)
         # -----------------------------------------------
         # ----------------------------------------------------
@@ -566,6 +566,10 @@ while 1:
 
         if (now.hour >= 6 and now.hour <= 20):
             print(beepsound())
+            print(beepsound())
+            print(beepsound())
+            print(beepsound())
+            print(beepsound())
        # ========================================================================================================
 
     # --------------------------------------------------------------------
@@ -574,17 +578,17 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     #if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if ((ttlamt >= 1000 and ahnttlper >= 110) and ((marketcnt >= 100 and ahncntper >= 100 and marketamt >= 500 and ahnamtper >= 100 and marketper >= 800 and ahnperper >= 100)
-       or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))):
+    if (((marketcnt >= 300 and ahncntper >= 105 and marketamt >= 1000 and ahnamtper >= 105 and marketper >= 1500 and ahnperper >= 105)
+       or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50)) and (ttlamt >= 1000 and ahnttlper >= 120)):
 
-        print(ahndate1 ,ahndate2 , " =======> check   marketcnt >= 100 marketamt >= 500 marketper >= 800  ttlamt >= 1000  cnt(",
-              marketcnt," ", marketcntold,") ", ahncntper, "  amt=(",marketamt,"% ", marketamtold,"% ",  ahnamtper,"%  ttlamt >= 1000 ",ttlamt,"  amtttlper=",  ahnttlper, ")%  T(", marketper,"% ",marketperold,"% ", ahnperper,"%) ",ahnresult)
+        print(ahndate1 ,ahndate2 , " marketcnt >= 300 marketamt >= 1000 marketper >= 1500  ttlamt >= 1000 ahnttlper >= 120 cnt(",
+              marketcnt," ", marketcntold,") ", ahncntper, "  amt=(",marketamt,"% ", marketamtold,"% ",  ahnamtper,"%)  T(", marketper,"% ",marketperold,"% ", ahnperper,"%)  ttlamt >= 1000 :",ttlamt,"  amtttlper>=120:",  ahnttlper, "%) ",ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + " =======> check   marketcnt >= 100 marketamt >= 500 marketper >= 800  ttlamt >= 1000   cnt(" + str(marketcnt) + " " + str(
-                marketcntold) + " " + str(ahncntper) + ")%    amt( " + str(marketamt) + "% " + str(marketamtold) + "% " + str(ahnamtper) + "% ttlamt >= 1000 "+str(ttlamt)+" "+ str(
-                ahnttlper)+")%    T:("  + str(marketper) + "% " + str(marketperold) + "% " + str(ahnperper) + "%) " + str(ahnresult) + "% \n"
+            p = ahndate1 + " " + ahndate2 + "  marketcnt >= 300 marketamt >= 1000 marketper >= 1500  ttlamt >= 1000 ahnttlper >= 120  cnt(" + str(marketcnt) + " " + str(
+                marketcntold) + " " + str(ahncntper) + ")%    amt( " + str(marketamt) + "% " + str(marketamtold) + "% " + str(ahnamtper) + "%) T:("  + str(marketper) + "% " + str(marketperold) + "% " + str(ahnperper) + "%) ttlamt >= 1000 "+str(ttlamt)+" >=120:"+ str(
+                ahnttlper)+"%) " + str(ahnresult) + "% \n"
             f.write(p)
             # -----------------------------------------------
         # ----------------------------------------------------
@@ -652,14 +656,14 @@ while 1:
     # ---------------------------------------------------
     # ----------------------------------------------------
     print(ahndate1,ahndate2,"  BTC(", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, " ",BTCdiff,":",BTCdiffold, ")  cnt(", buycnt,
-          "/", sellcnt, "=", marketcnt," ", ahncntper,"%)  amt(", buyamt, "/", sellamt, "=", marketamt," ", ahnamtper, "%)  Tamt=(",
-          ttlamt,ahnttlper,"%) T%=(" ,marketper," ", ahnperper,"%)  <",ahnresult,"% ", result11, result12,">")
+          "/", sellcnt, "=", marketcnt," ", ahncntper,"%)  amt(", buyamt, "/", sellamt, "=", marketamt," ", ahnamtper, "%)  T%=(" ,marketper," ", ahnperper,"%)  Tamt=(",
+          ttlamt,ahnttlper,"%) <",ahnresult,"% ", result11, result12,">")
     # ---------------------------------------------------
     # ----------------------------------------------------
     with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
         p = ahndate1+" "+ ahndate2+" BTC(" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +" "+str(BTCdiff)+":"+str(BTCdiffold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
-            marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)  Tamt=( " + str(
-            ttlamt)+ " " + str(ahnttlper) + "%) T%=(" + str(marketper)+ " " + str(ahnperper) + "%)  <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
+            marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)   T%=(" + str(marketper)+ " " + str(ahnperper) + "%) Tamt=( " + str(
+            ttlamt)+ " " + str(ahnttlper) + "%) <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
         f.write(p)
     # -----------------------------------------------
     # -----------------------------------------------
@@ -926,8 +930,8 @@ while 1:
     sleepsec = 600  # 10분
     if (now.hour >= 21 and now.hour <= 24):
         sleepsec = 1800 #  30분
-    if (now.hour >= 0 and now.hour <= 6):
-        sleepsec = 3600 #  1시간
+    if (now.hour >= 0 and now.hour <= 4):
+        sleepsec = 1800 #  1시간
     # ----------------------------------------------------
     sleep(sleepsec)
 # --------------------------------------------------------------------
