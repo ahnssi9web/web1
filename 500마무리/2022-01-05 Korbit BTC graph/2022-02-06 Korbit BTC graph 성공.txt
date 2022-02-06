@@ -329,11 +329,11 @@ while 1:
         marketper = marketcnt
         #print(" ---marketcnt = ", marketcnt,"  sellcnt=", sellcnt, "  buycnt=", buycnt)
 
-    if (marketcnt > 200):
+    if (marketcnt > 500):
         result11 = "상승"
         ahnres11 = 30
         #print("--- marketcnt 장-----")
-    elif (marketcnt < 200 and marketcnt > 50):
+    elif (marketcnt < 500 and marketcnt > 50):
         result11 = "보합"
         ahnres11 = 20
     #    #print("--- marketcnt 보합-----")
@@ -348,11 +348,11 @@ while 1:
         marketper = marketper + marketamt
     #--------------------------------------------------------------------------
     #print(" ---marketamt = ", marketamt, "  buycnt=", buycnt, " buyamt=", buyamt, "  sellcnt=", sellcnt, "   sellamt=", sellamt)
-    if (marketamt > 200):
+    if (marketamt > 800):
         result12 = "상상승"
         ahnres12 = 60
         #print("--- marketamt 상승장-----")
-    elif (marketamt < 200 and marketamt > 50):
+    elif (marketamt < 800 and marketamt > 50):
         result12 = "보보합"
         ahnres12 = 40
         #print("--- marketamt 보합-----")
