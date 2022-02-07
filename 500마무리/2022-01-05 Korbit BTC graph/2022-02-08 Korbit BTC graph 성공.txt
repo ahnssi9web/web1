@@ -153,7 +153,7 @@ while 1:
     ahndate  = ahndate1 + ' / ' + ahndate2
     #print(ahndate)
     #nowDatetime = ahndate
-    nowDatetime = ahndate2
+    nowDatetime = ahndate2  # 시간만 표시하자
     #===============================================================
     # graph가 중첩되어 시간도 많이 걸리고 복잡하므로 Sheet1을 지우고 새로 만들어 사용
     #
@@ -397,6 +397,7 @@ while 1:
     BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnssi9/Desktop/BTCfile.xlsx", data_only=True)
     BTCSheet = BTCfile['Sheet']
     lenBTCSheet = len(BTCSheet['A'])
+    #print(" BTC lenBTCSheet=",lenBTCSheet)
     BTCSheet.cell(lenBTCSheet+1, 1).value = nowDatetime
     BTCSheet.cell(lenBTCSheet+1, 2).value = BTCpriceNow
     BTCSheet.cell(lenBTCSheet+1, 3).value = BTCprice
@@ -475,7 +476,7 @@ while 1:
     graphSheet.cell(1, 27).value = 'datetime'
     # ---------------------------------------------------
     j = 1
-    graphcnt = 100
+    graphcnt = 30
 
     for i in range(lenBTCSheet - graphcnt + 1, lenBTCSheet + 1):
         j = j + 1
@@ -633,19 +634,17 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if (((marketcnt >= 200 and ahncntper >= 100 and marketamt >= 300 and ahnamtper >= 100 and marketper >= 500 and ahnperper >= 100)
-         or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))
+    if ((marketcnt >= 200 and ahncntper >= 100 and marketamt >= 300 and ahnamtper >= 100 and marketper >= 500 and ahnperper >= 100)
             and (ttlamt >= 500 and ahnttlper >= 102) and (BTCdiff > 10 and BTCdiffold > 10 and BTCdiffold - BTCdiffoldold > 10)):
         sleepahn = 60*1
-        print(ahndate1, ahndate2, " 알림3 **행동 개시** 추세 200 300 500 500 102 BTCdiff > 10 cnt(",
+        print(ahndate1, ahndate2, " 알림4 상승 **행동 개시** 추세 200 300 500 500 102 BTCdiff > 10 cnt(",
               marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
-              "%) BTCdiff=(",
-              BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
+              "%) BTCdiff=(",BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  알림3 **행동 개시** 추세  200 300 500 500 102 BTCdiff > 10 cnt(" + str(
+            p = ahndate1 + " " + ahndate2 + "  알림4 상승  **행동 개시** 추세  200 300 500 500 102 BTCdiff > 10 cnt(" + str(
                 marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
                 marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
                 marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
@@ -661,6 +660,96 @@ while 1:
         def beepsound():
             freq = 1000  # range : 37 ~ 32767
             dur = 1000  # ms
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+
+
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepsound())
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # 메일 보내기
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        name = "ahnsangkoo"
+        emailid = "ahnssi9@hanmail.net"
+
+        # 제목, 본문 작성
+        msg = MIMEMultipart()
+        msg['Subject'] = " ** marketper=" + str(marketper) + "   ahnresult  : " + str(ahnresult) + result11 + result12
+        msg.attach(MIMEText('  내 삶의 행복한 순간  ', 'plain'))
+
+        # 파일첨부 (파일 미첨부시 생략가능)
+        attachment = open('C:/Users/ahnssi9/Desktop/graphfile.xlsx', 'rb')
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment', filename=('UTF-8', '', 'graphfile.xlsx'))
+        msg.attach(part)
+
+        # 세션생성, 로그인
+        smtpserver = 'smtp.gmail.com:587'
+        s = smtplib.SMTP(smtpserver)
+        s.starttls()
+        s.login('ahnssi98@gmail.com', 'fcwwkgkglatjqwhx')
+
+        # 메일 전송
+        s.sendmail("   Center", emailid, msg.as_string())
+        s.quit()
+        # ----------------------------------------------------
+        # print(ahndate1 ,ahndate2 ," ---   메일보내기   marketper  = ",marketper,"%    ahnresult   : ",ahnresult,"%     " ,result11,result12," ",name,  emailid + ' \n')
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  ---- 메일보내기  ---->" + str(marketper) + "%   " + str(
+                ahnresult) + "%    " + result11 + " " + result12 + "  " + name + " " + emailid + " \n"
+            f.write(p)
+        # -----------------------------------------------
+    # --------------------------------------------------------------------
+    #
+    # --------------------------------------------------------------------
+
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 4
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
+    if (((marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))
+            and (ttlamt >= 500 and ahnttlper >= 102) and (BTCdiff < -10 and BTCdiffold <-10 and BTCdiffold - BTCdiffoldold < -10)):
+        sleepahn = 60*1
+        print(ahndate1, ahndate2, " 알림4 하락  **행동 개시** 추세 200 300 500 500 102 BTCdiff > 10 cnt(",
+              marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
+              "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
+              "%) BTCdiff=(",BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  알림4 하락  **행동 개시** 추세  200 300 500 500 102 BTCdiff > 10 cnt(" + str(
+                marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
+                marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
+                marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
+                ahnttlper) + "%) (" + str(BTCdiff) + " " + str(BTCdiffold) + "  " + str(BTCdiffoldold) + "  " + str(
+                BTCdiffold - BTCdiffoldold) + ") " + str(ahnresult) + "% \n"
+            f.write(p)
+            # -----------------------------------------------
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # 경보
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        def beepsound():
+            freq = 1000  # range : 37 ~ 32767
+            dur = 1000  # ms
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+            ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
             ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
             ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
             ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
@@ -728,7 +817,7 @@ while 1:
     # ---------------------------------------------------
     # ---------------------------------------------------
     with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-        p = ahndate1+" "+ ahndate2+" (" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +")("+str(BTCdiff)+" "+str(BTCdiffold)+"  "+str(BTCdiffoldold)+":"+str(BTCdiffold-BTCdiffoldold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+        p = "0208"+ahndate1+" "+ ahndate2+" (" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +")("+str(BTCdiff)+" "+str(BTCdiffold)+"  "+str(BTCdiffoldold)+":"+str(BTCdiffold-BTCdiffoldold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
             marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)  T%=(" + str(marketper)+ " " + str(ahnperper) + "%) Tamt=( " + str(
             ttlamt)+ " " + str(ahnttlper) + "%)  <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
         f.write(p)
@@ -1001,6 +1090,6 @@ while 1:
     if(sleepahn > 0):
         sleepsec = 600  # 10분
     # ----------------------------------------------------
+    #sleepsec = 60*2
     sleep(sleepsec)
-    #sleep(60*5)
     # --------------------------------------------------------------------
