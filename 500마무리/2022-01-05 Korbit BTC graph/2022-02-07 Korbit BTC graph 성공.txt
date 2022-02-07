@@ -593,15 +593,16 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     #if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if (((marketcnt >= 300 and ahncntper >= 100 and marketamt >= 800 and ahnamtper >= 100 and marketper >=1000 and ahnperper >= 100)
-       or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50)) and (ttlamt >= 1000 and ahnttlper >= 100)):
+    if (((marketcnt >= 200 and ahncntper >= 100 and marketamt >= 500 and ahnamtper >= 100 and marketper >=1000 and ahnperper >= 100)
+        or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))
+        and (ttlamt >= 800 and ahnttlper >= 100)):
         sleepahn = 600
-        print(ahndate1 ,ahndate2 , " 추세변동 점검  marketcnt >= 300 marketamt >= 800 marketper >= 1000  ttlamt >= 1000 ahnttlper >= 100 cnt(",
+        print(ahndate1 ,ahndate2 , " 추세변동 점검  marketcnt >= 200 marketamt >= 500 marketper >= 1000  ttlamt >= 800 ahnttlper >= 100 cnt(",
               marketcnt," ", marketcntold,") ", ahncntper, "  amt=(",marketamt,"% ", marketamtold,"% ",  ahnamtper,"%)  T(", marketper,"% ",marketperold,"% ", ahnperper,"%)  ttlamt >= 1000 :",ttlamt,"  amtttlper>=120:",  ahnttlper, "%) ",ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  추세변동 점검  marketcnt >= 300 marketamt >= 800 marketper >= 1000  ttlamt >= 1000 ahnttlper >= 100  cnt(" + str(marketcnt) + " " + str(
+            p = ahndate1 + " " + ahndate2 + "  추세변동 점검  marketcnt >= 200 marketamt >= 500 marketper >= 1000  ttlamt >= 800 ahnttlper >= 100  cnt(" + str(marketcnt) + " " + str(
                 marketcntold) + " " + str(ahncntper) + ")%    amt( " + str(marketamt) + "% " + str(marketamtold) + "% " + str(ahnamtper) + "%) T:("  + str(marketper) + "% " + str(marketperold) + "% " + str(ahnperper) + "%) ttlamt >= 1000 "+str(ttlamt)+" >=120:"+ str(
                 ahnttlper)+"%) " + str(ahnresult) + "% \n"
             f.write(p)
@@ -670,8 +671,9 @@ while 1:
     #  lengraphSheet 아용하여 각종 자료 출력하기
     # ---------------------------------------------------
     # ----------------------------------------------------
-    print(ahndate1,ahndate2," (", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, ")(",BTCdiff,BTCdiffold,BTCdiffoldold,(BTCdiffold-BTCdiffoldold),") cnt(", buycnt,
-          "/", sellcnt,marketcnt,ahncntper,"%)  amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T%(" ,marketper,ahnperper,"%) T(",
+    #print(ahndate1,ahndate2," (", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, ")(",BTCdiff,BTCdiffold,BTCdiffoldold,(BTCdiffold-BTCdiffoldold),") cnt(", buycnt,
+    print(ahndate1, ahndate2, " (", BTCpriceNow, BTCprice, BTCmaxprice, BTCminprice, ")(", BTCdiff, (BTCdiffold - BTCdiffoldold), ") cnt(", buycnt,
+                "/", sellcnt,marketcnt,ahncntper,"%)  amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T%(" ,marketper,ahnperper,"%) T(",
           ttlamt,ahnttlper,"%) <",ahnresult,"% ", result11, result12,">")
     # ---------------------------------------------------
     # ---------------------------------------------------
