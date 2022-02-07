@@ -593,18 +593,18 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     #if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if (((marketcnt >= 200 and ahncntper >= 100 and marketamt >= 500 and ahnamtper >= 100 and marketper >=1000 and ahnperper >= 100)
+    if (((marketcnt >= 200 and ahncntper >= 100 and marketamt >= 300 and ahnamtper >= 100 and marketper >=500 and ahnperper >= 100)
         or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))
-        and (ttlamt >= 800 and ahnttlper >= 100)):
+        and (ttlamt >= 500 and ahnttlper >= 102) and (BTCdiff > 10 and BTCdiffold > 10 and BTCdiffold-BTCdiffoldold>10)):
         sleepahn = 600
-        print(ahndate1 ,ahndate2 , " 추세변동 점검  marketcnt >= 200 marketamt >= 500 marketper >= 1000  ttlamt >= 800 ahnttlper >= 100 cnt(",
-              marketcnt," ", marketcntold,") ", ahncntper, "  amt=(",marketamt,"% ", marketamtold,"% ",  ahnamtper,"%)  T(", marketper,"% ",marketperold,"% ", ahnperper,"%)  ttlamt >= 1000 :",ttlamt,"  amtttlper>=120:",  ahnttlper, "%) ",ahnresult)
+        print(ahndate1 ,ahndate2 , " 추세 200 300 500 500 102 BTCdiff > 10 cnt(",
+              marketcnt," ", marketcntold,")", ahncntper, " amt=(",marketamt,"%", marketamtold,"%",  ahnamtper,"%) T(", marketper,"%",marketperold,"%", ahnperper,"%)  T:",ttlamt," ",ahnttlper, "%) BTCdiff=(",BTCdiff,BTCdiffold,BTCdiffoldold,BTCdiffold-BTCdiffoldold,") ",ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  추세변동 점검  marketcnt >= 200 marketamt >= 500 marketper >= 1000  ttlamt >= 800 ahnttlper >= 100  cnt(" + str(marketcnt) + " " + str(
-                marketcntold) + " " + str(ahncntper) + ")%    amt( " + str(marketamt) + "% " + str(marketamtold) + "% " + str(ahnamtper) + "%) T:("  + str(marketper) + "% " + str(marketperold) + "% " + str(ahnperper) + "%) ttlamt >= 1000 "+str(ttlamt)+" >=120:"+ str(
-                ahnttlper)+"%) " + str(ahnresult) + "% \n"
+            p = ahndate1 + " " + ahndate2 + " 추세  200 300 500 500 102 BTCdiff > 10 cnt(" + str(marketcnt) + " " + str(
+                marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(marketamtold) + "% " + str(ahnamtper) + "%) T:("  + str(marketper) + "% " + str(marketperold) + "% " + str(ahnperper) + "%) "+str(ttlamt)+" "+ str(
+                ahnttlper)+"%) ("+str(BTCdiff)+" "+str(BTCdiffold)+"  "+str(BTCdiffoldold)+"  "+str(BTCdiffold-BTCdiffoldold)+") "+ str(ahnresult) + "% \n"
             f.write(p)
             # -----------------------------------------------
         # ----------------------------------------------------
@@ -672,15 +672,15 @@ while 1:
     # ---------------------------------------------------
     # ----------------------------------------------------
     #print(ahndate1,ahndate2," (", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, ")(",BTCdiff,BTCdiffold,BTCdiffoldold,(BTCdiffold-BTCdiffoldold),") cnt(", buycnt,
-    print(ahndate1, ahndate2, " (", BTCpriceNow, BTCprice, BTCmaxprice, BTCminprice, ")(", BTCdiff, (BTCdiffold - BTCdiffoldold), ") cnt(", buycnt,
-                "/", sellcnt,marketcnt,ahncntper,"%)  amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T%(" ,marketper,ahnperper,"%) T(",
-          ttlamt,ahnttlper,"%) <",ahnresult,"% ", result11, result12,">")
+    print(ahndate1, ahndate2, " (", BTCpriceNow, BTCprice, BTCmaxprice, BTCminprice, ")(", BTCdiff,BTCdiffold,BTCdiffoldold, (BTCdiffold - BTCdiffoldold), ") cnt(", buycnt,
+                "/", sellcnt,marketcnt,ahncntper,"%) amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T(" ,marketper,ahnperper,"%",
+          ttlamt,ahnttlper,"%)",ahnresult,result11,result12)
     # ---------------------------------------------------
     # ---------------------------------------------------
     with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-        p = ahndate1+" "+ ahndate2+" BTC(" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +" "+str(BTCdiff)+":"+str(BTCdiffold-BTCdiffoldold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+        p = ahndate1+" "+ ahndate2+" (" + str(BTCpriceNow) + " " + str(BTCprice)+" " +  str(BTCmaxprice)+" " +  str(BTCminprice) +")("+str(BTCdiff)+" "+str(BTCdiffold)+"  "+str(BTCdiffoldold)+":"+str(BTCdiffold-BTCdiffoldold)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
             marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)  T%=(" + str(marketper)+ " " + str(ahnperper) + "%) Tamt=( " + str(
-            ttlamt)+ " " + str(ahnttlper) + "%) <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
+            ttlamt)+ " " + str(ahnttlper) + "%)  <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
         f.write(p)
     # -----------------------------------------------
     # -----------------------------------------------
@@ -951,6 +951,6 @@ while 1:
     if(sleepahn > 0):
         sleepsec = 600  # 10분
     # ----------------------------------------------------
-    sleep(sleepsec)
-    #sleep(60)
+    #sleep(sleepsec)
+    sleep(60*5)
     # --------------------------------------------------------------------
