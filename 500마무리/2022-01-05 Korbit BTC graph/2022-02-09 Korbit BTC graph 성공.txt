@@ -4,7 +4,7 @@ import datetime
 from time import sleep
 #now = datetime.now()
 #print(now.hour)
-#print("Áö±İÀº", now.year, "³â", now.month, "¿ù", now.day, "ÀÏ", now.hour, "½Ã", now.minute, "ºĞ", now.second, "ÃÊÀÔ´Ï´Ù. \n")
+#print("ì§€ê¸ˆì€", now.year, "ë…„", now.month, "ì›”", now.day, "ì¼", now.hour, "ì‹œ", now.minute, "ë¶„", now.second, "ì´ˆì…ë‹ˆë‹¤. \n")
 
 
 import os
@@ -32,8 +32,8 @@ v = os.path.isfile("C:/Users/ahnss/Desktop/korbit.csv")
 if v == False:
     f = open("C:/Users/ahnss/Desktop/korbit.csv", mode="w", encoding="cp949", newline='')
     writer = csv.writer(f)
-    writer.writerow(['nowDatetime', 'type', 'price', 'amount','tid'])
-    print(" make korbit.csv first line --> nowDatetime type  price  amount tid ----")
+    writer.writerow(['nowDatetime', 'type', 'price', 'amount','tid', 'time', 'length'])
+    print(" make korbit.csv first line --> nowDatetime type  price  amount tid time len(dict) ")
     f.close()
 
 v = os.path.isfile("C:/Users/ahnss/Desktop/BTCfile.xlsx")
@@ -98,7 +98,7 @@ if v == False:
 # ---------------------------------------------------
 
 
-# ================= ÀÌ½ÂÁØ °­»çÀÇ ¼³¸í¹® =======================================
+# ================= ì´ìŠ¹ì¤€ ê°•ì‚¬ì˜ ì„¤ëª…ë¬¸ =======================================
 class color:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
@@ -121,20 +121,20 @@ class color:
     ENDC = '\033[0m'
 
 
-# Font: ¸¼Àº°íµñ Å©±â15 ±½°Ô
-font_15 = Font(name='±Ã¼­Ã¼', size=15, bold=True)
+# Font: ë§‘ì€ê³ ë”• í¬ê¸°15 êµµê²Œ
+font_15 = Font(name='ê¶ì„œì²´', size=15, bold=True)
 
-# Alignment; °¡·Î ¼¼·Î °¡¿îµ¥ Á¤·Ä
+# Alignment; ê°€ë¡œ ì„¸ë¡œ ê°€ìš´ë° ì •ë ¬
 align_center = Alignment(horizontal='center', vertical='center')
 align_vcenter = Alignment(vertical='center')
 
-# Border Å×µÎ¸® ÁöÁ¤
+# Border í…Œë‘ë¦¬ ì§€ì •
 border_thin = Border(left=Side(style='thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
 
-# PatternFill ¼¿ »ö»ó ÁöÁ¤
+# PatternFill ì…€ ìƒ‰ìƒ ì§€ì •
 fill_orange = PatternFill(patternType='solid', fgColor=Color('FFC000'))
 fill_lightgrey = PatternFill(patternType='solid', fgColor=Color('D3D3D3'))
-# ================= ÀÌ½ÂÁØ °­»çÀÇ ¼³¸í¹® =======================================
+# ================= ì´ìŠ¹ì¤€ ê°•ì‚¬ì˜ ì„¤ëª…ë¬¸ =======================================
 
 
 
@@ -145,17 +145,17 @@ while 1:
     nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
     #print(nowDatetime)  # 2015-04-19 12:11:32
     #print(now.hour)
-    #print("Áö±İÀº", now.year, "³â", now.month, "¿ù", now.day, "ÀÏ", now.hour, "½Ã", now.minute, "ºĞ",now.second, "ÃÊÀÔ´Ï´Ù. \n")
+    #print("ì§€ê¸ˆì€", now.year, "ë…„", now.month, "ì›”", now.day, "ì¼", now.hour, "ì‹œ", now.minute, "ë¶„",now.second, "ì´ˆì…ë‹ˆë‹¤. \n")
     #print(now.day)
     #print(now.hour)
     ahndate1 = nowDatetime[5:11]
     ahndate2 = nowDatetime[11:16]
     ahndate  = ahndate1 + '/' + ahndate2
     #print(ahndate)
-    nowDatetime = ahndate  # ³¯Â¥¿Í ½Ã°£ Ç¥½Ã
-    #nowDatetime = ahndate2  # ½Ã°£¸¸ Ç¥½ÃÇÏÀÚ
+    nowDatetime = ahndate  # ë‚ ì§œì™€ ì‹œê°„ í‘œì‹œ
+    #nowDatetime = ahndate2  # ì‹œê°„ë§Œ í‘œì‹œí•˜ì
     #===============================================================
-    # graph°¡ ÁßÃ¸µÇ¾î ½Ã°£µµ ¸¹ÀÌ °É¸®°í º¹ÀâÇÏ¹Ç·Î Sheet1À» Áö¿ì°í »õ·Î ¸¸µé¾î »ç¿ë
+    # graphê°€ ì¤‘ì²©ë˜ì–´ ì‹œê°„ë„ ë§ì´ ê±¸ë¦¬ê³  ë³µì¡í•˜ë¯€ë¡œ Sheet1ì„ ì§€ìš°ê³  ìƒˆë¡œ ë§Œë“¤ì–´ ì‚¬ìš©
     #
     #===============================================================
     #print(graphfile.sheetnames)
@@ -176,13 +176,13 @@ while 1:
     dict = json.loads(req.text)
     #print(req.text)
     #-------------------------------------------------------------------------------
-    # korbit data ±¸Á¶ ---> ¿©·¯°³¸¦ ¸®½ºÆ®·Î ¸¸µé¾î¼­ ÀúÀåÇÔ
+    # korbit data êµ¬ì¡° ---> ì—¬ëŸ¬ê°œë¥¼ ë¦¬ìŠ¤íŠ¸ë¡œ ë§Œë“¤ì–´ì„œ ì €ì¥í•¨
     #   [{"timestamp":1625969554661,"tid":"11777395","price":"39763000","amount":"0.0001337","type":"buy"},
     #    {"timestamp":1625969544303,"tid":"11777394","price":"39769000","amount":"0.00099771","type":"buy"},
     #    {"timestamp":1625969531685,"tid":"11777393","price":"39738000","amount":"0.001","type":"sell"},
     #-------------------------------------------------------------------------------
     #-------------------------------------------------------------------------------
-    # ÇÑ¹ø ÀĞ¾î¿À¸é ¾à150-200°³ »çÀÌÀÓ
+    # í•œë²ˆ ì½ì–´ì˜¤ë©´ ì•½150-200ê°œ ì‚¬ì´ì„
     for i in range(len(dict)-1,1, -1):
     #for i in range(len(dict), len(dict)):
         #print(i,len(dict))
@@ -193,7 +193,9 @@ while 1:
         Korbittime = datetime.datetime.fromtimestamp(timestamp / 1000).time()
         #print(i, Korbitdate,Korbittime)  # 2015-04-19 12:11:32
         #print(i, str(Korbitdate)+str(Korbittime))  # 2015-04-19 12:11:32
-        ahndatetime = str(Korbitdate)+str(Korbittime)
+        ahndatetime = str(Korbitdate)+"/"+str(Korbittime)
+
+        #print(i, ahndatetime,"--",str(Korbitdate)+str(Korbittime))  # 2015-04-19 12:11:32
 
         type = dict[i].get('type')
         price = dict[i].get('price')
@@ -202,7 +204,7 @@ while 1:
 
         #Korbittime = timestamp.strftime('%Y-%m-%d %H:%M:%S')
         # print(now.hour)
-        # print("Áö±İÀº", now.year, "³â", now.month, "¿ù", now.day, "ÀÏ", now.hour, "½Ã", now.minute, "ºĞ",now.second, "ÃÊÀÔ´Ï´Ù. \n")
+        # print("ì§€ê¸ˆì€", now.year, "ë…„", now.month, "ì›”", now.day, "ì¼", now.hour, "ì‹œ", now.minute, "ë¶„",now.second, "ì´ˆì…ë‹ˆë‹¤. \n")
         # print(now.day)
         # print(now.hour)
         #Kordate1 = Korbittime[5:11]
@@ -212,7 +214,10 @@ while 1:
         #writer.writerow([nowDatetime, type, price, amount, tid])
         #writer.writerow([Korbittime, type, price, amount, tid])
         #writer.writerow([ahndate, type, price, amount, tid])
-        writer.writerow([ahndatetime, type, price, amount, tid])
+        if (i == len(dict)-1):
+              writer.writerow([ahndatetime, type, price, amount, tid, Korbittime, len(dict)])
+        else:
+              writer.writerow([ahndatetime, type, price, amount, tid])
         #.writerow([Kordate, type, price, amount, tid])
     f.close()
     # ----------------------------------------------------------
@@ -222,7 +227,7 @@ while 1:
     #print("--- BTCpriceNow : ", BTCpriceNow)
     sleep(1)
     # ----------------------------------------------------------
-    # korbit.csv¸¦ ¿­°í µ¥ÀÌÅ¸¸¦ µñ¼Å³Ê¸®·Î ÀĞ¾îµéÀÎ´Ù. DictReader
+    # korbit.csvë¥¼ ì—´ê³  ë°ì´íƒ€ë¥¼ ë”•ì…”ë„ˆë¦¬ë¡œ ì½ì–´ë“¤ì¸ë‹¤. DictReader
     # ----------------------------------------------------------
     #print(ahndate1 ,ahndate2 ,"read  korbit data ------------------> ")
     f = open('C:/Users/ahnss/Desktop/korbit.csv', 'r')
@@ -267,12 +272,17 @@ while 1:
     i = 0
     BTCpricettl = 0
     # -------------------------------------------------
-    # ÇÑ ¹ø¿¡ 500°³¾¿ ÀĞ¾î¿Â´Ù°í »ı°¢µÇ¹Ç·Î 1½Ã°£¿¡ 3000°³ 10½Ã°£¿¡ 30000°³ ÀĞ¾î¿È
-    # ÃÖ±Ù 24½Ã°£ µ¿¾ÈÀÇ ¾à60000°³ÀÇ »çÀÚ¿Í ÆÈÀÚÀÇ ºñÀ²ÀÌ ¾î¶»°Ô µÇ´ÂÁö ºñ±³ÇØº¸ÀÚ
+    # í•œ ë²ˆì— 200ê°œì”© ì½ì–´ì˜¨ë‹¤ê³  ìƒê°ë˜ë¯€ë¡œ 1ì‹œê°„ ë‹¨ìœ„ ì¸¡ì •í•˜ë©°  10ì‹œê°„ì— 2,000ê°œ  30ë¶„ ë‹¨ìœ„ ì¸¡ì •ì€ 10ì‹œê°„ 4,000ê°œ
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    ttllinecnt = 2000   # ê³ ì •í•´ì•¼ ë¨ ," ttlamt>200 ",ttlamtê°€ ë³€í•˜ë‹ˆ ì•„ë˜ ìˆ˜ì‹ë“¤ì´ ë‹¬ë¼ì ¸ì•¼ ë˜ê¸°ì—
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
     #for i in range(1, ttlline):
-    for i in range(ttlline-30000, ttlline):
+    for i in range(ttlline-ttllinecnt, ttlline):
         #print(i, " ----- ",ahnkorbit[i][0],"=====", ahnkorbit[i])
-
         if (float(ahnkorbit[i][1]) > BTCmaxprice):
             BTCmaxprice = float(ahnkorbit[i][1])
         if (float(ahnkorbit[i][1]) < BTCminprice):
@@ -310,7 +320,7 @@ while 1:
     # BTCdiff =   BTCmaxprice - BTCminprice
     # BTCdiff = round(float(BTCdiff), 0)
     BTCdiff = int(BTCdiff)
-    BTCdiffold = 0 # ¾Æ·¡¿¡¼­ ³ª¿È
+    BTCdiffold = 0 # ì•„ë˜ì—ì„œ ë‚˜ì˜´
     # ---------------------------------------------------
     BTCmaxprice = round(float((BTCmaxprice)) / 10000, 0)
     BTCminprice = round(float((BTCminprice)) / 10000, 0)
@@ -321,53 +331,53 @@ while 1:
     # ---------------------------------------------------
     # ---------------------------------------------------
     #print("-----------korbit  end of line ---")
-    #print(ahndate1 ,ahndate2 ,"--- 11 korbit  BTC °¡°İ : ",float(ahnkorbit[i][1]), " ÃÖ±Ù BTC 1000°³ buy : ", buycnt, " ¼ö·® : ", buyamt," <<<>>>  sell : ", sellcnt, " ¼ö·® : ", sellamt)
+    #print(ahndate1 ,ahndate2 ,"--- 11 korbit  BTC ê°€ê²© : ",float(ahnkorbit[i][1]), " ìµœê·¼ BTC 1000ê°œ buy : ", buycnt, " ìˆ˜ëŸ‰ : ", buyamt," <<<>>>  sell : ", sellcnt, " ìˆ˜ëŸ‰ : ", sellamt)
     #print("--- BTCpriceNow : ", BTCpriceNow, " ---- BTCprice = ", BTCprice, " ---- (buycnt+sellcnt)=",(buycnt+sellcnt))
     marketper = 0
-    #=============== ÃÖ±Ù ÀÚ·á buy sell ÁÖ¹®°Ç¼ö ºñ±³ buy°¡ ¸¹À¸¸é »ó½ÂÀå ÆÇ´Ü
+    #=============== ìµœê·¼ ìë£Œ buy sell ì£¼ë¬¸ê±´ìˆ˜ ë¹„êµ buyê°€ ë§ìœ¼ë©´ ìƒìŠ¹ì¥ íŒë‹¨
     if (buycnt > 0 and sellcnt > 0):
         marketcnt =  buycnt/sellcnt*100
         marketper = marketcnt
         #print(" ---marketcnt = ", marketcnt,"  sellcnt=", sellcnt, "  buycnt=", buycnt)
 
     if (marketcnt > 500):
-        result11 = "»ó½Â"
+        result11 = "ìƒìŠ¹"
         ahnres11 = 30
-        #print("--- marketcnt Àå-----")
+        #print("--- marketcnt ì¥-----")
     elif (marketcnt < 500 and marketcnt > 50):
-        result11 = "º¸ÇÕ"
+        result11 = "ë³´í•©"
         ahnres11 = 20
-    #    #print("--- marketcnt º¸ÇÕ-----")
+    #    #print("--- marketcnt ë³´í•©-----")
     else:
-        result11 = "ÇÏ¶ô"
+        result11 = "í•˜ë½"
         ahnres11 = 10
-    #    #print("--- marketcnt ÇÏ¶ôÀå-----")
+    #    #print("--- marketcnt í•˜ë½ì¥-----")
 
-    #=============== ÃÖ±Ù ÀÚ·áÀÇ buy sell ÁÖ¹®¼ö·® ºñ±³ buy°¡ ¸¹À¸¸é »ó½ÂÀå ÆÇ´Ü
+    #=============== ìµœê·¼ ìë£Œì˜ buy sell ì£¼ë¬¸ìˆ˜ëŸ‰ ë¹„êµ buyê°€ ë§ìœ¼ë©´ ìƒìŠ¹ì¥ íŒë‹¨
     if (sellamt > 0):
         marketamt =  buyamt/sellamt*100
         marketper = marketper + marketamt
     #--------------------------------------------------------------------------
     #print(" ---marketamt = ", marketamt, "  buycnt=", buycnt, " buyamt=", buyamt, "  sellcnt=", sellcnt, "   sellamt=", sellamt)
     if (marketamt > 800):
-        result12 = "»ó»ó½Â"
+        result12 = "ìƒìƒìŠ¹"
         ahnres12 = 60
-        #print("--- marketamt »ó½ÂÀå-----")
+        #print("--- marketamt ìƒìŠ¹ì¥-----")
     elif (marketamt < 800 and marketamt > 50):
-        result12 = "º¸º¸ÇÕ"
+        result12 = "ë³´ë³´í•©"
         ahnres12 = 40
-        #print("--- marketamt º¸ÇÕ-----")
+        #print("--- marketamt ë³´í•©-----")
     else:
-        result12 = "ÇÏÇÏ¶ô"
+        result12 = "í•˜í•˜ë½"
         ahnres12 = 20
-        #print("--- marketamt ÇÏ¶ôÀå-----")
+        #print("--- marketamt í•˜ë½ì¥-----")
     # ----------------------------------------------------
     # ----------------------------------------------------
 
     # ----------------------------------------------------
     ahnresult  = ahnres11+ahnres12
     # ----------------------------------------------------
-    # ±×·¡ÇÈ¿ë --- 10,000°³¸¦ ÇÕ»êÇÏ´Ï Å©±â°¡ Ä¿¼­  100À¸·Î ³ª´©¾î 100´ÜÀ§·Î ¸¸µë
+    # ê·¸ë˜í”½ìš© --- 10,000ê°œë¥¼ í•©ì‚°í•˜ë‹ˆ í¬ê¸°ê°€ ì»¤ì„œ  100ìœ¼ë¡œ ë‚˜ëˆ„ì–´ 100ë‹¨ìœ„ë¡œ ë§Œë“¬
     #------------------------------------------------------------------
 
 
@@ -395,7 +405,7 @@ while 1:
 
 
     # ========================================================================================================
-    #  ±âÁ¸ ¿¢¼¿ ÆÄÀÏ ºÒ·¯¿Í¼­ 100°³¸¸ graphfile.xlsx¿¡ ÀúÀåÇÏ°í ±×·¡ÇÁ ¸¸µé±â
+    #  ê¸°ì¡´ ì—‘ì…€ íŒŒì¼ ë¶ˆëŸ¬ì™€ì„œ 100ê°œë§Œ graphfile.xlsxì— ì €ì¥í•˜ê³  ê·¸ë˜í”„ ë§Œë“¤ê¸°
     BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/BTCfile.xlsx", data_only=True)
     BTCSheet = BTCfile['Sheet']
     lenBTCSheet = len(BTCSheet['A'])
@@ -432,15 +442,15 @@ while 1:
     # ========================================================================================================
     sleep(1)
     # ========================================================================================================
-    #  ±âÁ¸ ¿¢¼¿ ÆÄÀÏ ºÒ·¯¿Í¼­ 100°³¸¸ graphfile.xlsx¿¡ ÀúÀåÇÏ°í ±×·¡ÇÁ ¸¸µé±â
+    #  ê¸°ì¡´ ì—‘ì…€ íŒŒì¼ ë¶ˆëŸ¬ì™€ì„œ 100ê°œë§Œ graphfile.xlsxì— ì €ì¥í•˜ê³  ê·¸ë˜í”„ ë§Œë“¤ê¸°
     BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/BTCfile.xlsx", data_only=True)
     BTCSheet = BTCfile['Sheet']
-    #print(" BTCfile-->°¹¼ö : ",len(BTCSheet['A']))
+    #print(" BTCfile-->ê°¯ìˆ˜ : ",len(BTCSheet['A']))
     lenBTCSheet = len(BTCSheet['A'])
-    # ¸¶Áö¸· °ªÀÌ Á¸ÀçÇÏ´Â ¼¿(row): sheet.max_row
-    # ¸¶Áö¸· °ªÀÌ Á¸ÀçÇÏ´Â ¼¿(column): sheet.max_column
+    # ë§ˆì§€ë§‰ ê°’ì´ ì¡´ì¬í•˜ëŠ” ì…€(row): sheet.max_row
+    # ë§ˆì§€ë§‰ ê°’ì´ ì¡´ì¬í•˜ëŠ” ì…€(column): sheet.max_column
     # ---------------------------------------------------
-    #  Ã­Æ® ±×·Á³Ö¾î ÀÌ¸ŞÀÏ º¸³¾ ÆÄÀÏ ºÒ·¯¿À±â
+    #  ì± íŠ¸ ê·¸ë ¤ë„£ì–´ ì´ë©”ì¼ ë³´ë‚¼ íŒŒì¼ ë¶ˆëŸ¬ì˜¤ê¸°
     graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
     graphSheet = graphfile['Sheet1']
     #print("before delete : ",graphSheet.cell(graphSheet.max_row, 1).value)
@@ -522,6 +532,7 @@ while 1:
     # ---------------------------------------------------
     #print(ahndate1, ahndate2, " =======> ", BTCpriceNow, "   ", BTCprice, "   BTCmaxprice :", BTCmaxprice, " = ", BTCminprice, " BTCdiff=", BTCdiff," BTCdiffold=", BTCdiffold)
     # ---------------------------------------------------
+    #ttlamtold =1
     # ---------------------------------------------------
     ahncntper = marketcnt / marketcntold * 100
     ahnamtper = marketamt / marketamtold * 100
@@ -533,20 +544,20 @@ while 1:
     ahnperper = round(float(ahnperper),1)
     ahnttlper = round(float(ahnttlper),1)
 
-    graphSheet.cell(graphcnt+1, 19).value =  ahncntper   # BTCfile.xlsx¿¡´Â 0À¸·Î µÇ¾îÀÖ°í graphfile.xlsx¿¡¸¸ µé¾î°£´Ù
-    graphSheet.cell(graphcnt+1, 20).value =  ahnamtper   # BTCfile.xlsx¿¡´Â 0À¸·Î µÇ¾îÀÖ°í graphfile.xlsx¿¡¸¸ µé¾î°£´Ù
-    graphSheet.cell(graphcnt+1, 21).value =  ahnttlper   # BTCfile.xlsx¿¡´Â 0À¸·Î µÇ¾îÀÖ°í graphfile.xlsx¿¡¸¸ µé¾î°£´Ù
-    graphSheet.cell(graphcnt+1, 22).value =  ahnperper   # BTCfile.xlsx¿¡´Â 0À¸·Î µÇ¾îÀÖ°í graphfile.xlsx¿¡¸¸ µé¾î°£´Ù
+    graphSheet.cell(graphcnt+1, 19).value =  ahncntper   # BTCfile.xlsxì—ëŠ” 0ìœ¼ë¡œ ë˜ì–´ìˆê³  graphfile.xlsxì—ë§Œ ë“¤ì–´ê°„ë‹¤
+    graphSheet.cell(graphcnt+1, 20).value =  ahnamtper   # BTCfile.xlsxì—ëŠ” 0ìœ¼ë¡œ ë˜ì–´ìˆê³  graphfile.xlsxì—ë§Œ ë“¤ì–´ê°„ë‹¤
+    graphSheet.cell(graphcnt+1, 21).value =  ahnttlper   # BTCfile.xlsxì—ëŠ” 0ìœ¼ë¡œ ë˜ì–´ìˆê³  graphfile.xlsxì—ë§Œ ë“¤ì–´ê°„ë‹¤
+    graphSheet.cell(graphcnt+1, 22).value =  ahnperper   # BTCfile.xlsxì—ëŠ” 0ìœ¼ë¡œ ë˜ì–´ìˆê³  graphfile.xlsxì—ë§Œ ë“¤ì–´ê°„ë‹¤
     # ---------------------------------------------------
     # ---------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
     BTCfile.close()
     sleep(1)
-    #print(i, lenBTCSheet,"  BTCdiff=", BTCdiff,BTCdiffold," percent Áõ°¡À² °ËÅä : cnt=",marketcnt, marketcntold, ahncntper,"  amt=",marketamt, marketamtold, ahnamtper,"  per=",marketper, marketperold, ahnperper)
+    #print(i, lenBTCSheet,"  BTCdiff=", BTCdiff,BTCdiffold," percent ì¦ê°€ìœ¨ ê²€í†  : cnt=",marketcnt, marketcntold, ahncntper,"  amt=",marketamt, marketamtold, ahnamtper,"  per=",marketper, marketperold, ahnperper)
     # --------------------------------------------------------------------
     # ========================================================================================================
-    #  ±âÁ¸ ¿¢¼¿ ÆÄÀÏ ºÒ·¯¿Í¼­ 100°³¸¸ graphfile.xlsx¿¡ ÀúÀåÇÏ°í ±×·¡ÇÁ ¸¸µé±â
+    #  ê¸°ì¡´ ì—‘ì…€ íŒŒì¼ ë¶ˆëŸ¬ì™€ì„œ 100ê°œë§Œ graphfile.xlsxì— ì €ì¥í•˜ê³  ê·¸ë˜í”„ ë§Œë“¤ê¸°
     BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/BTCfile.xlsx", data_only=True)
     BTCSheet = BTCfile['Sheet']
     lenBTCSheet = len(BTCSheet['A'])
@@ -557,25 +568,25 @@ while 1:
     BTCfile.save('C:/Users/ahnss/Desktop/BTCfile.xlsx')
     # ========================================================================================================
     # --------------------------------------------------------------------
-    # ¾Ë¸² 1
+    # ì•Œë¦¼ 1
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------    # --------------------------------------------------------------------
     #if (BTCdiff >=100 or BTCdiff <= -100):
     #if (BTCpriceNow-BTCprice >=200 or BTCpriceNow-BTCprice <= -200 or (Btcdiff>0 and Btcdiffold<0) or (Btcdiff<0 and Btcdiffold>0)):
     #if (BTCpriceNow - BTCprice >= 200 or BTCpriceNow - BTCprice <= -200 or (BTCdiff > 0 and BTCdiffold < 0) or (
     #            BTCdiff < 0 and BTCdiffold > 0)):
-    if ((BTCdiff > 0 and BTCdiffold < 0 and BTCdiffold-BTCdiffoldold >10) or (BTCdiff < 0 and BTCdiffold > 0 and BTCdiffold-BTCdiffoldold < -10)):
+    if (ttlamt>200 and (BTCdiff > 0 and BTCdiffold < 0 and BTCdiffold-BTCdiffoldold >10) or (BTCdiff < 0 and BTCdiffold > 0 and BTCdiffold-BTCdiffoldold < -10)):
     #if ((BTCdiff > 0 and BTCdiffold < 0) or (BTCdiff < 0 and BTCdiffold > 0)):
         sleepahn = 60*3
-        print(ahndate1 ,ahndate2 , " =======> ¾Ë¸²1 °¡°İº¯µ¿ BTCdiff=",BTCdiff,"    BTCdiffold=",BTCdiffold,"    BTCdiffoldold=",BTCdiffoldold,"    BTCdiffold-BTCdiffoldold=",BTCdiffold-BTCdiffoldold)
+        print(ahndate1 ,ahndate2 ," ttlamt>200 ",ttlamt," =======> ì•Œë¦¼1 ê°€ê²©ë³€ë™ BTCdiff=",BTCdiff,"    BTCdiffold=",BTCdiffold,"    BTCdiffoldold=",BTCdiffoldold,"    BTCdiffold-BTCdiffoldold=",BTCdiffold-BTCdiffoldold)
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  ¾Ë¸²1 °¡°İº¯µ¿ BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+"   BTCdiffoldold="+str(BTCdiffoldold)+"    BTCdiffold-BTCdiffoldold="+str(BTCdiffold-BTCdiffoldold)+ "  \n"
+            p = ahndate1 + " " + ahndate2,+" ttlamt>200 "+str(ttlamt)+ "  ì•Œë¦¼1 ê°€ê²©ë³€ë™ BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+"   BTCdiffoldold="+str(BTCdiffoldold)+"    BTCdiffold-BTCdiffoldold="+str(BTCdiffold-BTCdiffoldold)+ "  \n"
         # ----------------------------------------------------") " + "  \n"
             f.write(p)
         # -----------------------------------------------
         # ----------------------------------------------------
-        # °æº¸
+        # ê²½ë³´
         # --------------------------------------------------------------------
         def beepsound():
             freq = 500  # range : 37 ~ 32767
@@ -592,22 +603,22 @@ while 1:
 
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¾Ë¸² 2
+    # ì•Œë¦¼ 2
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if (((marketcnt >= 200 and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
+    if (ttlamt>200 and ((marketcnt >= 200 and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
          or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))):
         sleepahn = 60*3
-        print(ahndate1, ahndate2, " ¾Ë¸²2 Ãß¼¼  cnt(",marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
+        print(ahndate1, ahndate2, " ì•Œë¦¼2 ì¶”ì„¸  ttlamt>200 and ((marketcnt >= 200 and ahncntper >= 100.1 and  --->>>  cnt(",marketcnt, " ", marketcntold, " ", ahncntper, ") amt=(", marketamt, " ", marketamtold, " ", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper, ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + " ¾Ë¸²2 Ãß¼¼  cnt(" + str(marketcnt) + " " + str(
+            p = ahndate1 + " " + ahndate2 + " ì•Œë¦¼2 ì¶”ì„¸  cnt(" + str(marketcnt) + " " + str(
                 marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
                 marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
-                marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
+                marketperold) + "% " + str(ahnperper) + "%)  >=200 " + str(ttlamt) + " " + str(
                 ahnttlper) + "%) " + str(ahnresult) + "% \n"
             f.write(p)
             # -----------------------------------------------
@@ -615,7 +626,7 @@ while 1:
 
         # ----------------------------------------------------
         # ----------------------------------------------------
-        # °æº¸
+        # ê²½ë³´
         # --------------------------------------------------------------------
         # --------------------------------------------------------------------
         def beepsound():
@@ -632,21 +643,21 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¾Ë¸² 3
+    # ì•Œë¦¼ 3
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
     if ((marketcnt >= 200 and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
-            and (ttlamt >= 500 and ahnttlper >= 100.1) and (BTCdiff > 10 and BTCdiffold > 10 and BTCdiffold - BTCdiffoldold > 10)):
+            and (ttlamt >= 200 and ahnttlper >= 100.1) and (BTCdiff > 10 and BTCdiffold > 10 and BTCdiffold - BTCdiffoldold > 10)):
         sleepahn = 60*1
-        print(ahndate1, ahndate2, " ¾Ë¸²3 »ó½Â **Çàµ¿ °³½Ã** Ãß¼¼ 200 300 500 500 100.1 BTCdiff > 10 cnt(",
+        print(ahndate1, ahndate2, " ì•Œë¦¼3 ìƒìŠ¹ **í–‰ë™ ê°œì‹œ** ì¶”ì„¸ 200 300 500 500 100.1 BTCdiff > 10 cnt(",
               marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
               "%) BTCdiff=(",BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  ¾Ë¸²3 »ó½Â  **Çàµ¿ °³½Ã** Ãß¼¼  200 300 500 500 100.1 BTCdiff > 10 cnt(" + str(
+            p = ahndate1 + " " + ahndate2 + "  ì•Œë¦¼3 ìƒìŠ¹  **í–‰ë™ ê°œì‹œ** ì¶”ì„¸  200 300 500 200 100.1 BTCdiff > 10 cnt(" + str(
                 marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
                 marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
                 marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
@@ -656,7 +667,7 @@ while 1:
             # -----------------------------------------------
         # ----------------------------------------------------
         # ----------------------------------------------------
-        # °æº¸
+        # ê²½ë³´
         # --------------------------------------------------------------------
         # --------------------------------------------------------------------
         def beepsound():
@@ -676,18 +687,18 @@ while 1:
         # ----------------------------------------------------
         # ----------------------------------------------------
         # ----------------------------------------------------
-        # ¸ŞÀÏ º¸³»±â
+        # ë©”ì¼ ë³´ë‚´ê¸°
         # --------------------------------------------------------------------
         # --------------------------------------------------------------------
         name = "ahnsangkoo"
         emailid = "ahnssi9@hanmail.net"
 
-        # Á¦¸ñ, º»¹® ÀÛ¼º
+        # ì œëª©, ë³¸ë¬¸ ì‘ì„±
         msg = MIMEMultipart()
         msg['Subject'] = " ** marketper=" + str(marketper) + "   ahnresult  : " + str(ahnresult) + result11 + result12
-        msg.attach(MIMEText('  ³» »îÀÇ Çàº¹ÇÑ ¼ø°£  ', 'plain'))
+        msg.attach(MIMEText('  ë‚´ ì‚¶ì˜ í–‰ë³µí•œ ìˆœê°„  ', 'plain'))
 
-        # ÆÄÀÏÃ·ºÎ (ÆÄÀÏ ¹ÌÃ·ºÎ½Ã »ı·«°¡´É)
+        # íŒŒì¼ì²¨ë¶€ (íŒŒì¼ ë¯¸ì²¨ë¶€ì‹œ ìƒëµê°€ëŠ¥)
         attachment = open('C:/Users/ahnss/Desktop/graphfile.xlsx', 'rb')
         part = MIMEBase('application', 'octet-stream')
         part.set_payload((attachment).read())
@@ -695,20 +706,20 @@ while 1:
         part.add_header('Content-Disposition', 'attachment', filename=('UTF-8', '', 'graphfile.xlsx'))
         msg.attach(part)
 
-        # ¼¼¼Ç»ı¼º, ·Î±×ÀÎ
+        # ì„¸ì…˜ìƒì„±, ë¡œê·¸ì¸
         smtpserver = 'smtp.gmail.com:587'
         s = smtplib.SMTP(smtpserver)
         s.starttls()
         s.login('ahnssi98@gmail.com', 'fcwwkgkglatjqwhx')
 
-        # ¸ŞÀÏ Àü¼Û
+        # ë©”ì¼ ì „ì†¡
         s.sendmail("   Center", emailid, msg.as_string())
         s.quit()
         # ----------------------------------------------------
-        # print(ahndate1 ,ahndate2 ," ---   ¸ŞÀÏº¸³»±â   marketper  = ",marketper,"%    ahnresult   : ",ahnresult,"%     " ,result11,result12," ",name,  emailid + ' \n')
+        # print(ahndate1 ,ahndate2 ," ---   ë©”ì¼ë³´ë‚´ê¸°   marketper  = ",marketper,"%    ahnresult   : ",ahnresult,"%     " ,result11,result12," ",name,  emailid + ' \n')
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  ---- ¸ŞÀÏº¸³»±â  ---->" + str(marketper) + "%   " + str(
+            p = ahndate1 + " " + ahndate2 + "  ---- ë©”ì¼ë³´ë‚´ê¸°  ---->" + str(marketper) + "%   " + str(
                 ahnresult) + "%    " + result11 + " " + result12 + "  " + name + " " + emailid + " \n"
             f.write(p)
         # -----------------------------------------------
@@ -719,21 +730,21 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¾Ë¸² 4
+    # ì•Œë¦¼ 4
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
     if (((marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))
-            and (ttlamt >= 500 and ahnttlper >= 100.1) and (BTCdiff < -10 and BTCdiffold <-10 and BTCdiffold - BTCdiffoldold < -10)):
+            and (ttlamt >= 200 and ahnttlper >= 100.1) and (BTCdiff < -10 and BTCdiffold <-10 and BTCdiffold - BTCdiffoldold < -10)):
         sleepahn = 60*1
-        print(ahndate1, ahndate2, " ¾Ë¸²4 ÇÏ¶ô  **Çàµ¿ °³½Ã** Ãß¼¼ 200 300 500 500 102 BTCdiff > 10 cnt(",
+        print(ahndate1, ahndate2, " ì•Œë¦¼4 í•˜ë½  **í–‰ë™ ê°œì‹œ** ì¶”ì„¸ 200 300 500 200 102 BTCdiff > 10 cnt(",
               marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
               "%) BTCdiff=(",BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  ¾Ë¸²4 ÇÏ¶ô  **Çàµ¿ °³½Ã** Ãß¼¼  200 300 500 500 102 BTCdiff > 10 cnt(" + str(
+            p = ahndate1 + " " + ahndate2 + "  ì•Œë¦¼4 í•˜ë½  **í–‰ë™ ê°œì‹œ** ì¶”ì„¸  200 300 500 500 102 BTCdiff > 10 cnt(" + str(
                 marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
                 marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
                 marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
@@ -743,7 +754,7 @@ while 1:
             # -----------------------------------------------
         # ----------------------------------------------------
         # ----------------------------------------------------
-        # °æº¸
+        # ê²½ë³´
         # --------------------------------------------------------------------
         # --------------------------------------------------------------------
         def beepsound():
@@ -763,18 +774,18 @@ while 1:
         # ----------------------------------------------------
         # ----------------------------------------------------
         # ----------------------------------------------------
-        # ¸ŞÀÏ º¸³»±â
+        # ë©”ì¼ ë³´ë‚´ê¸°
         # --------------------------------------------------------------------
         # --------------------------------------------------------------------
         name = "ahnsangkoo"
         emailid = "ahnssi9@hanmail.net"
 
-        # Á¦¸ñ, º»¹® ÀÛ¼º
+        # ì œëª©, ë³¸ë¬¸ ì‘ì„±
         msg = MIMEMultipart()
         msg['Subject'] = " ** marketper=" + str(marketper) + "   ahnresult  : " + str(ahnresult) + result11 + result12
-        msg.attach(MIMEText('  ³» »îÀÇ Çàº¹ÇÑ ¼ø°£  ', 'plain'))
+        msg.attach(MIMEText('  ë‚´ ì‚¶ì˜ í–‰ë³µí•œ ìˆœê°„  ', 'plain'))
 
-        # ÆÄÀÏÃ·ºÎ (ÆÄÀÏ ¹ÌÃ·ºÎ½Ã »ı·«°¡´É)
+        # íŒŒì¼ì²¨ë¶€ (íŒŒì¼ ë¯¸ì²¨ë¶€ì‹œ ìƒëµê°€ëŠ¥)
         attachment = open('C:/Users/ahnss/Desktop/graphfile.xlsx', 'rb')
         part = MIMEBase('application', 'octet-stream')
         part.set_payload((attachment).read())
@@ -782,20 +793,20 @@ while 1:
         part.add_header('Content-Disposition', 'attachment', filename=('UTF-8', '', 'graphfile.xlsx'))
         msg.attach(part)
 
-        # ¼¼¼Ç»ı¼º, ·Î±×ÀÎ
+        # ì„¸ì…˜ìƒì„±, ë¡œê·¸ì¸
         smtpserver = 'smtp.gmail.com:587'
         s = smtplib.SMTP(smtpserver)
         s.starttls()
         s.login('ahnssi98@gmail.com', 'fcwwkgkglatjqwhx')
 
-        # ¸ŞÀÏ Àü¼Û
+        # ë©”ì¼ ì „ì†¡
         s.sendmail("   Center", emailid, msg.as_string())
         s.quit()
         # ----------------------------------------------------
-        # print(ahndate1 ,ahndate2 ," ---   ¸ŞÀÏº¸³»±â   marketper  = ",marketper,"%    ahnresult   : ",ahnresult,"%     " ,result11,result12," ",name,  emailid + ' \n')
+        # print(ahndate1 ,ahndate2 ," ---   ë©”ì¼ë³´ë‚´ê¸°   marketper  = ",marketper,"%    ahnresult   : ",ahnresult,"%     " ,result11,result12," ",name,  emailid + ' \n')
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  ---- ¸ŞÀÏº¸³»±â  ---->" + str(marketper) + "%   " + str(
+            p = ahndate1 + " " + ahndate2 + "  ---- ë©”ì¼ë³´ë‚´ê¸°  ---->" + str(marketper) + "%   " + str(
                 ahnresult) + "%    " + result11 + " " + result12 + "  " + name + " " + emailid + " \n"
             f.write(p)
         # -----------------------------------------------
@@ -805,11 +816,11 @@ while 1:
     # --------------------------------------------------------------------
     graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
     graphSheet = graphfile['Sheet1']
-    #print(" graphSheet -->°¹¼ö : ",len(graphSheet['A']))
+    #print(" graphSheet -->ê°¯ìˆ˜ : ",len(graphSheet['A']))
     lengraphSheet = len(graphSheet['A'])
     # --------------------------------------------------------------------
     # ---------------------------------------------------
-    #  lengraphSheet ¾Æ¿ëÇÏ¿© °¢Á¾ ÀÚ·á Ãâ·ÂÇÏ±â
+    #  lengraphSheet ì•„ìš©í•˜ì—¬ ê°ì¢… ìë£Œ ì¶œë ¥í•˜ê¸°
     # ---------------------------------------------------
     # ----------------------------------------------------
     #print(ahndate1,ahndate2," (", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, ")(",BTCdiff,BTCdiffold,BTCdiffoldold,(BTCdiffold-BTCdiffoldold),") cnt(", buycnt,
@@ -826,39 +837,39 @@ while 1:
     # -----------------------------------------------
     # -----------------------------------------------
     # ---------------------------------------------------
-    #  Ã­Æ® ±×·Á³Ö±â
+    #  ì± íŠ¸ ê·¸ë ¤ë„£ê¸°
     # ---------------------------------------------------
     # -----------------------
-    # Â÷Æ® ÃÊ±âÈ­
+    # ì°¨íŠ¸ ì´ˆê¸°í™”
     # -----------------------
     # -----------------------
     # chart = Barchart()
     chart = LineChart()
     # -----------------------------------------------
     # -----------------------------------------------
-    #chart.title = name + " ½ºÅä¸®Áö [" + storageno + "] CFX º¸»ó·®"
-    chart.x_axis.title = '2022³â'
+    #chart.title = name + " ìŠ¤í† ë¦¬ì§€ [" + storageno + "] CFX ë³´ìƒëŸ‰"
+    chart.x_axis.title = '2022ë…„'
     chart.y_axis.title = 'BTC PRICE'
 
-    # ------ °¡°İ
+    # ------ ê°€ê²©
     # ------CHARDATA B1-E1 (2,1)-(5,1)
-    # ------CATEGORY(ÀÏ½Ã) A1-A41 (1,1)-(1,41)
+    # ------CATEGORY(ì¼ì‹œ) A1-A41 (1,1)-(1,41)
     # --------------------------------------------------------------------
-    # chartData  BTC °¡°İ B1:E41  min_col = 2,min_row = 1,(B1) max_col = 5 , max_row = 41(E41) )
+    # chartData  BTC ê°€ê²© B1:E41  min_col = 2,min_row = 1,(B1) max_col = 5 , max_row = 41(E41) )
     chartData = Reference(graphSheet, min_col=2, min_row=(lengraphSheet) - graphcnt, max_col=5, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    # category  ---> xÃà ³¯Â¥ Ç¥½Ã A2 :A41  min_col = 1, 	min_row=2, max_row=41
+    # category  ---> xì¶• ë‚ ì§œ í‘œì‹œ A2 :A41  min_col = 1, 	min_row=2, max_row=41
     # --------------------------------------------------------------------
     category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    #  category ---> yÃà °£°İÀº ÀÚµ¿À¸·Î °è»êµÊ
+    #  category ---> yì¶• ê°„ê²©ì€ ìë™ìœ¼ë¡œ ê³„ì‚°ë¨
     # --------------------------------------------------------------------
-    chart.add_data(chartData, titles_from_data=True)  # title_from_data´Â ¹ü·Ê °ª
+    chart.add_data(chartData, titles_from_data=True)  # title_from_dataëŠ” ë²”ë¡€ ê°’
     chart.set_categories(category)
     # --------------------------------------------------------------------
     # -------------------------------------------------------------------
     # ----------------------------------------------------
-    # Áß°£Áß°£ ²Ù¹Ì±â ±ÛÀÚÅ°¿ì±â »ö»ó ³Ö±â µî
+    # ì¤‘ê°„ì¤‘ê°„ ê¾¸ë¯¸ê¸° ê¸€ìí‚¤ìš°ê¸° ìƒ‰ìƒ ë„£ê¸° ë“±
     # --------------------------------------------------------------------
     for row in graphSheet['F2:F25']:
         for cell in row:
@@ -875,66 +886,66 @@ while 1:
             cell.alignment = align_vcenter
             cell.fill = fill_orange
     # ----------------------------------------------------
-    # ¿Ï¼ºµÈ Ã­Æ®¸¦ ±×¸®±â
+    # ì™„ì„±ëœ ì± íŠ¸ë¥¼ ê·¸ë¦¬ê¸°
     # -----------------------------------------------
     graphSheet.add_chart(chart, 'A1')
     # -----------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
     # ----------------------------------------------------
-    # print("------Ã­Æ®¿Ï¼º graphfile.xlsx ÀúÀå ---------------------")
+    # print("------ì± íŠ¸ì™„ì„± graphfile.xlsx ì €ì¥ ---------------------")
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
     # -----------------------------------------------
     # ------------------------------------------------------------------------------------
-    #  Ã­Æ® ±×·Á³Ö±â 2
+    #  ì± íŠ¸ ê·¸ë ¤ë„£ê¸° 2
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
     graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
     graphSheet = graphfile['Sheet1']
-    # print(" graphSheet -->°¹¼ö : ",len(graphSheet['A']))
+    # print(" graphSheet -->ê°¯ìˆ˜ : ",len(graphSheet['A']))
     lengraphSheet = len(graphSheet['A'])
     # ----------------------------------------------------
-    # print("------LineChart Ã­Æ®±×¸®±â ½ÃÀÛ ---------------------")
-    # Â÷Æ® ÃÊ±âÈ­
+    # print("------LineChart ì± íŠ¸ê·¸ë¦¬ê¸° ì‹œì‘ ---------------------")
+    # ì°¨íŠ¸ ì´ˆê¸°í™”
     # chart = Barchart()
     chart = LineChart()
 
-    # chart.title = name + " ½ºÅä¸®Áö [" + storageno + "] CFX º¸»ó·®"
-    chart.x_axis.title = '2022³â'
+    # chart.title = name + " ìŠ¤í† ë¦¬ì§€ [" + storageno + "] CFX ë³´ìƒëŸ‰"
+    chart.x_axis.title = '2022ë…„'
     chart.y_axis.title = 'BUY/SELL CNT'
     # --------------------------------------------------------------------
     # ------BUYCNT-SELLCNT
     # ------CHARDATA K1-M41 (11,1) - (13,41)
-    # ------CATEGORY(ÀÏ½Ã) J1-J41  (10,1)-(10,41)
+    # ------CATEGORY(ì¼ì‹œ) J1-J41  (10,1)-(10,41)
     # ------BUYCNT
     # ------CHARDATA H1-I41 (8,1) - (9,41)
-    # ------CATEGORY(ÀÏ½Ã) G1-G41 (7,1)-(7,41)
+    # ------CATEGORY(ì¼ì‹œ) G1-G41 (7,1)-(7,41)
     # --------------------------------------------------------------------
     # chartData  BUY CNT H1:I41  min_col = 8,min_row = 1,(H1) max_col = 9 , max_row = 41(I41) )
     chartData = Reference(graphSheet, min_col=8, min_row=(lengraphSheet) - graphcnt, max_col=9, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    # category  ---> xÃà ³¯Â¥ Ç¥½Ã G1-G41  min_col = 7, min_row=2, max_row=41
+    # category  ---> xì¶• ë‚ ì§œ í‘œì‹œ G1-G41  min_col = 7, min_row=2, max_row=41
     # --------------------------------------------------------------------
     #category = Reference(graphSheet, min_col=7, min_row=(lengraphSheet) - graphcnt, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    # category  ---> xÃà ³¯Â¥ Ç¥½Ã A2 :A41  min_col = 1, 	min_row=2, max_row=41
+    # category  ---> xì¶• ë‚ ì§œ í‘œì‹œ A2 :A41  min_col = 1, 	min_row=2, max_row=41
     # --------------------------------------------------------------------
     category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    #  category ---> yÃà °£°İÀº ÀÚµ¿À¸·Î °è»êµÊ
+    #  category ---> yì¶• ê°„ê²©ì€ ìë™ìœ¼ë¡œ ê³„ì‚°ë¨
     # --------------------------------------------------------------------
-    chart.add_data(chartData, titles_from_data=True)  # title_from_data´Â ¹ü·Ê °ª
+    chart.add_data(chartData, titles_from_data=True)  # title_from_dataëŠ” ë²”ë¡€ ê°’
     chart.set_categories(category)
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¿Ï¼ºµÈ Ã­Æ®¸¦ ±×¸®±â
+    # ì™„ì„±ëœ ì± íŠ¸ë¥¼ ê·¸ë¦¬ê¸°
     # -----------------------------------------------
     graphSheet.add_chart(chart, 'K1')
     # -----------------------------------------------
-    # print("------Ã­Æ®¿Ï¼ºÇÏ¿© graphfile.xlsx ÀúÀå ---------------------")
+    # print("------ì± íŠ¸ì™„ì„±í•˜ì—¬ graphfile.xlsx ì €ì¥ ---------------------")
     # ----------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
@@ -943,46 +954,46 @@ while 1:
 
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
-    #  Ã­Æ® ±×·Á³Ö±â 3
+    #  ì± íŠ¸ ê·¸ë ¤ë„£ê¸° 3
     # ------------------------------------------------------------------------------------
     graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
     graphSheet = graphfile['Sheet1']
-    # print(" graphSheet -->°¹¼ö : ",len(graphSheet['A']))
+    # print(" graphSheet -->ê°¯ìˆ˜ : ",len(graphSheet['A']))
     lengraphSheet = len(graphSheet['A'])
     # ----------------------------------------------------
-    # print("------LineChart Ã­Æ®±×¸®±â ½ÃÀÛ ---------------------")
-    # Â÷Æ® ÃÊ±âÈ­
+    # print("------LineChart ì± íŠ¸ê·¸ë¦¬ê¸° ì‹œì‘ ---------------------")
+    # ì°¨íŠ¸ ì´ˆê¸°í™”
     # chart = Barchart()
     chart = LineChart()
 
-    # chart.title = name + " ½ºÅä¸®Áö [" + storageno + "] CFX º¸»ó·®"
-    chart.x_axis.title = '2022³â'
+    # chart.title = name + " ìŠ¤í† ë¦¬ì§€ [" + storageno + "] CFX ë³´ìƒëŸ‰"
+    chart.x_axis.title = '2022ë…„'
     chart.y_axis.title = 'BUY/SELL AMT'
     # --------------------------------------------------------------------
     # ------BUYAMT-TTLAMT
     # ------CHARDATA K1-M41 (11,1) - (13,41)
-    # ------CATEGORY(ÀÏ½Ã) J1-J41  (10,1)-(10,41)
+    # ------CATEGORY(ì¼ì‹œ) J1-J41  (10,1)-(10,41)
 
     # --------------------------------------------------------------------
     # chartData  BUYAMT-TTLAMT K1-M41  min_col = 11,min_row = 1,(k1) max_col = 13 , max_row = 41(M41) )
     chartData = Reference(graphSheet, min_col=11, min_row=(lengraphSheet) - graphcnt, max_col=13,
                           max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    # category  ---> xÃà ³¯Â¥ Ç¥½Ã J1-J41  min_col = 10, 	min_row=2, max_row=41
+    # category  ---> xì¶• ë‚ ì§œ í‘œì‹œ J1-J41  min_col = 10, 	min_row=2, max_row=41
     # --------------------------------------------------------------------
     category = Reference(graphSheet, min_col=10, min_row=(lengraphSheet) - graphcnt, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    #  category ---> yÃà °£°İÀº ÀÚµ¿À¸·Î °è»êµÊ
+    #  category ---> yì¶• ê°„ê²©ì€ ìë™ìœ¼ë¡œ ê³„ì‚°ë¨
     # --------------------------------------------------------------------
-    chart.add_data(chartData, titles_from_data=True)  # title_from_data´Â ¹ü·Ê °ª
+    chart.add_data(chartData, titles_from_data=True)  # title_from_dataëŠ” ë²”ë¡€ ê°’
     chart.set_categories(category)
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¿Ï¼ºµÈ Ã­Æ®¸¦ ±×¸®±â
+    # ì™„ì„±ëœ ì± íŠ¸ë¥¼ ê·¸ë¦¬ê¸°
     # -----------------------------------------------
     graphSheet.add_chart(chart, 'K8')
     # -----------------------------------------------
-    # print("------Ã­Æ®¿Ï¼ºÇÏ¿© graphfile.xlsx ÀúÀå ---------------------")
+    # print("------ì± íŠ¸ì™„ì„±í•˜ì—¬ graphfile.xlsx ì €ì¥ ---------------------")
     # ----------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
@@ -993,46 +1004,46 @@ while 1:
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
-    #  Ã­Æ® ±×·Á³Ö±â 4
+    #  ì± íŠ¸ ê·¸ë ¤ë„£ê¸° 4
     # ------------------------------------------------------------------------------------
     graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
     graphSheet = graphfile['Sheet1']
-    # print(" graphSheet -->°¹¼ö : ",len(graphSheet['A']))
+    # print(" graphSheet -->ê°¯ìˆ˜ : ",len(graphSheet['A']))
     lengraphSheet = len(graphSheet['A'])
     # ----------------------------------------------------
-    # print("------LineChart Ã­Æ®±×¸®±â ½ÃÀÛ ---------------------")
-    # Â÷Æ® ÃÊ±âÈ­
+    # print("------LineChart ì± íŠ¸ê·¸ë¦¬ê¸° ì‹œì‘ ---------------------")
+    # ì°¨íŠ¸ ì´ˆê¸°í™”
     # chart = Barchart()
     chart = LineChart()
 
-    # chart.title = name + " ½ºÅä¸®Áö [" + storageno + "] CFX º¸»ó·®"
-    chart.x_axis.title = '2022³â'
+    # chart.title = name + " ìŠ¤í† ë¦¬ì§€ [" + storageno + "] CFX ë³´ìƒëŸ‰"
+    chart.x_axis.title = '2022ë…„'
     chart.y_axis.title = 'MARTKETPERCENT'
     # --------------------------------------------------------------------
     # ------MARTKETPERCENT
     # ------CHARDATA O1-Q41 (15,1) - (17,41)
-    # ------CATEGORY(ÀÏ½Ã) N1-N41 (14,1) - (14,41)
+    # ------CATEGORY(ì¼ì‹œ) N1-N41 (14,1) - (14,41)
 
     # --------------------------------------------------------------------
     # chartData  MARTKETPERCENT O1-Q41  min_col = 15,min_row = 1,(O1) max_col = 17 , max_row = 41(Q41) )
     chartData = Reference(graphSheet, min_col=15, min_row=(lengraphSheet) - graphcnt, max_col=17,
                           max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    # category  ---> xÃà ³¯Â¥ Ç¥½Ã  N1-N41  min_col = 14, 	min_row=2, max_row=41
+    # category  ---> xì¶• ë‚ ì§œ í‘œì‹œ  N1-N41  min_col = 14, 	min_row=2, max_row=41
     # --------------------------------------------------------------------
     category = Reference(graphSheet, min_col=14, min_row=(lengraphSheet) - graphcnt, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    #  category ---> yÃà °£°İÀº ÀÚµ¿À¸·Î °è»êµÊ
+    #  category ---> yì¶• ê°„ê²©ì€ ìë™ìœ¼ë¡œ ê³„ì‚°ë¨
     # --------------------------------------------------------------------
-    chart.add_data(chartData, titles_from_data=True)  # title_from_data´Â ¹ü·Ê °ª
+    chart.add_data(chartData, titles_from_data=True)  # title_from_dataëŠ” ë²”ë¡€ ê°’
     chart.set_categories(category)
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¿Ï¼ºµÈ Ã­Æ®¸¦ ±×¸®±â
+    # ì™„ì„±ëœ ì± íŠ¸ë¥¼ ê·¸ë¦¬ê¸°
     # -----------------------------------------------
     graphSheet.add_chart(chart, 'K15')
     # -----------------------------------------------
-    # print("------Ã­Æ®¿Ï¼ºÇÏ¿© graphfile.xlsx ÀúÀå ---------------------")
+    # print("------ì± íŠ¸ì™„ì„±í•˜ì—¬ graphfile.xlsx ì €ì¥ ---------------------")
     # ----------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
@@ -1041,56 +1052,57 @@ while 1:
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
-    #  Ã­Æ® ±×·Á³Ö±â 5
+    #  ì± íŠ¸ ê·¸ë ¤ë„£ê¸° 5
     # ------------------------------------------------------------------------------------
     graphfile = openpyxl.load_workbook(filename="C:/Users/ahnss/Desktop/graphfile.xlsx", data_only=True)
     graphSheet = graphfile['Sheet1']
-    # print(" graphSheet -->°¹¼ö : ",len(graphSheet['A']))
+    # print(" graphSheet -->ê°¯ìˆ˜ : ",len(graphSheet['A']))
     lengraphSheet = len(graphSheet['A'])
     # ----------------------------------------------------
-    # print("------LineChart Ã­Æ®±×¸®±â ½ÃÀÛ ---------------------")
-    # Â÷Æ® ÃÊ±âÈ­
+    # print("------LineChart ì± íŠ¸ê·¸ë¦¬ê¸° ì‹œì‘ ---------------------")
+    # ì°¨íŠ¸ ì´ˆê¸°í™”
     # chart = Barchart()
     chart = LineChart()
 
-    # chart.title = name + " ½ºÅä¸®Áö [" + storageno + "] CFX º¸»ó·®"
-    chart.x_axis.title = '2022³â'
+    # chart.title = name + " ìŠ¤í† ë¦¬ì§€ [" + storageno + "] CFX ë³´ìƒëŸ‰"
+    chart.x_axis.title = '2022ë…„'
     chart.y_axis.title = 'ahnper BTCdiff ahnresult'
     # --------------------------------------------------------------------
     # ------ahnper
     # ------CHARDATA S1-X41 (19,1) - (23,41)
-    # ------CATEGORY(ÀÏ½Ã) R1-R41 (18,1) - (18,41)
+    # ------CATEGORY(ì¼ì‹œ) R1-R41 (18,1) - (18,41)
 
     # --------------------------------------------------------------------
     # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 23 , max_row = 41
     chartData = Reference(graphSheet, min_col=19, min_row=(lengraphSheet) - graphcnt, max_col=23,
                           max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    # category  ---> xÃà ³¯Â¥ Ç¥½Ã  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # category  ---> xì¶• ë‚ ì§œ í‘œì‹œ  R1-R41  min_col = 18, 	min_row=2, max_row=41
     # --------------------------------------------------------------------
     category = Reference(graphSheet, min_col=18, min_row=(lengraphSheet) - graphcnt, max_row=(lengraphSheet))
     # --------------------------------------------------------------------
-    #  category ---> yÃà °£°İÀº ÀÚµ¿À¸·Î °è»êµÊ
+    #  category ---> yì¶• ê°„ê²©ì€ ìë™ìœ¼ë¡œ ê³„ì‚°ë¨
     # --------------------------------------------------------------------
-    chart.add_data(chartData, titles_from_data=True)  # title_from_data´Â ¹ü·Ê °ª
+    chart.add_data(chartData, titles_from_data=True)  # title_from_dataëŠ” ë²”ë¡€ ê°’
     chart.set_categories(category)
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
-    # ¿Ï¼ºµÈ Ã­Æ®¸¦ ±×¸®±â
+    # ì™„ì„±ëœ ì± íŠ¸ë¥¼ ê·¸ë¦¬ê¸°
     # -----------------------------------------------
     graphSheet.add_chart(chart, 'A11')
     # -----------------------------------------------
-    # print("------Ã­Æ®¿Ï¼ºÇÏ¿© graphfile.xlsx ÀúÀå ---------------------")
+    # print("------ì± íŠ¸ì™„ì„±í•˜ì—¬ graphfile.xlsx ì €ì¥ ---------------------")
     # ----------------------------------------------------
     graphfile.save('C:/Users/ahnss/Desktop/graphfile.xlsx')
     graphfile.close()
     # ------------------------------------------------------------------------------------
-    if (now.hour >= 8 and now.hour <= 21):
-        sleepsec = 1800 #30ºĞ
+    if (now.hour >= 8 and now.hour <= 19):
+        #sleepsec = 1800 #30ë¶„
+        sleepsec = 3600
     else:
-        sleepsec = 3600  #1½Ã°£
+        sleepsec = 3600  #1ì‹œê°„
     if(sleepahn > 0):
-        sleepsec = 600  # 10ºĞ
+        sleepsec = 600  # 10ë¶„
     # ----------------------------------------------------
     #sleepsec = 60*2
     sleep(sleepsec)
