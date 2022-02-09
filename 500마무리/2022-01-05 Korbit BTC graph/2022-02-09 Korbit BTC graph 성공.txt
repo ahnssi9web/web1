@@ -140,7 +140,20 @@ fill_lightgrey = PatternFill(patternType='solid', fgColor=Color('D3D3D3'))
 
 # ---------------------------------------------------
 while 1:
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    BTCmaxprice = 0
+    BTCminprice = 90000000   #주의
+    BTCdiff = 0
+    # ------------------------------------------------------------------------------------
+    ttllinecnt = 2000  # 고정해야 됨 ," ttlamt>200 ",ttlamt가 변하니 아래 수식들이 달라져야 되기에
+    # ------------------------------------------------------------------------------------
+    ttlamtahn = 200
+    # ------------------------------------------------------------------------------------
+    graphcnt = 30
     sleepahn = 0
+    # ------------------------------------------------------------------------------------
     now = datetime.datetime.now()
     nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
     #print(nowDatetime)  # 2015-04-19 12:11:32
@@ -233,10 +246,6 @@ while 1:
     f = open('C:/Users/ahnss/Desktop/korbit.csv', 'r')
     rdr = csv.DictReader(f)
     # ----------------------------------------------------------
-    BTCmaxprice = 0
-    BTCminprice = 90000000
-    BTCdiff = 0
-
     BTCprice = 0
     buycnt = 0
     sellcnt = 0
@@ -274,10 +283,7 @@ while 1:
     # -------------------------------------------------
     # 한 번에 200개씩 읽어온다고 생각되므로 1시간 단위 측정하며  10시간에 2,000개  30분 단위 측정은 10시간 4,000개
     # ------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------
-    ttllinecnt = 2000   # 고정해야 됨 ," ttlamt>200 ",ttlamt가 변하니 아래 수식들이 달라져야 되기에
-    # ------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------
+  # ------------------------------------------------------------------------------------
     # ------------------------------------------------------------------------------------
     # ----------------------------------------------------
     #for i in range(1, ttlline):
@@ -488,8 +494,6 @@ while 1:
     graphSheet.cell(1, 27).value = 'datetime'
     # ---------------------------------------------------
     j = 1
-    graphcnt = 30
-
     for i in range(lenBTCSheet - graphcnt + 1, lenBTCSheet + 1):
         j = j + 1
         graphSheet.cell(j, 1).value = BTCSheet.cell(i, 1).value
@@ -575,14 +579,14 @@ while 1:
     #if (BTCpriceNow-BTCprice >=200 or BTCpriceNow-BTCprice <= -200 or (Btcdiff>0 and Btcdiffold<0) or (Btcdiff<0 and Btcdiffold>0)):
     #if (BTCpriceNow - BTCprice >= 200 or BTCpriceNow - BTCprice <= -200 or (BTCdiff > 0 and BTCdiffold < 0) or (
     #            BTCdiff < 0 and BTCdiffold > 0)):
-    if (ttlamt>200 and (BTCdiff > 0 and BTCdiffold < 0 and BTCdiffold-BTCdiffoldold >10) or (BTCdiff < 0 and BTCdiffold > 0 and BTCdiffold-BTCdiffoldold < -10)):
+    if (ttlamt>ttlamtahn and (BTCdiff > 0 and BTCdiffold < 0 and BTCdiffold-BTCdiffoldold >10) or (BTCdiff < 0 and BTCdiffold > 0 and BTCdiffold-BTCdiffoldold < -10)):
     #if ((BTCdiff > 0 and BTCdiffold < 0) or (BTCdiff < 0 and BTCdiffold > 0)):
         sleepahn = 60*3
-        print(ahndate1 ,ahndate2 ," ttlamt>200 ",ttlamt," =======> 알림1 가격변동 BTCdiff=",BTCdiff,"    BTCdiffold=",BTCdiffold,"    BTCdiffoldold=",BTCdiffoldold,"    BTCdiffold-BTCdiffoldold=",BTCdiffold-BTCdiffoldold)
+        print(ahndate1 ,ahndate2 ," ttlamt>",ttlamtahn," ",ttlamt," =======> 알림1 가격변동 BTCdiff=",BTCdiff,"    BTCdiffold=",BTCdiffold,"    BTCdiffoldold=",BTCdiffoldold,"    BTCdiffold-BTCdiffoldold=",BTCdiffold-BTCdiffoldold)
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2,+" ttlamt>200 "+str(ttlamt)+ "  알림1 가격변동 BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+"   BTCdiffoldold="+str(BTCdiffoldold)+"    BTCdiffold-BTCdiffoldold="+str(BTCdiffold-BTCdiffoldold)+ "  \n"
-        # ----------------------------------------------------") " + "  \n"
+            p = ahndate1 + " " + ahndate2+" ttlamt>"+str(ttlamtahn)+" "+str(ttlamt)+ "  알림1 가격변동 BTCdiff="+str(BTCdiff)+"    BTCdiffold="+str(BTCdiffold)+"   BTCdiffoldold="+str(BTCdiffoldold)+"    BTCdiffold-BTCdiffoldold="+str(BTCdiffold-BTCdiffoldold)+ "  \n"
+        # ----------------------------------------------------
             f.write(p)
         # -----------------------------------------------
         # ----------------------------------------------------
@@ -607,10 +611,10 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if (ttlamt>200 and ((marketcnt >= 200 and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
+    if (ttlamt>200 and ((marketcnt >= ttlamtahn and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
          or (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))):
         sleepahn = 60*3
-        print(ahndate1, ahndate2, " 알림2 추세  ttlamt>200 and ((marketcnt >= 200 and ahncntper >= 100.1 and  --->>>  cnt(",marketcnt, " ", marketcntold, " ", ahncntper, ") amt=(", marketamt, " ", marketamtold, " ", ahnamtper,
+        print(ahndate1, ahndate2, " 알림2 추세  ttlamt>200 and ((marketcnt >= ttlamtahn  marketper >= 100.1 and  --->>>  cnt(",marketcnt, " ", marketcntold, " ", ahncntper, ") amt=(", marketamt, " ", marketamtold, " ", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper, ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
@@ -647,17 +651,17 @@ while 1:
     # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
-    if ((marketcnt >= 200 and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
-            and (ttlamt >= 200 and ahnttlper >= 100.1) and (BTCdiff > 10 and BTCdiffold > 10 and BTCdiffold - BTCdiffoldold > 10)):
+    if ((marketcnt >= ttlamtahn and ahncntper >= 100.1 and marketamt >= 300 and ahnamtper >= 100.1 and marketper >= 500 and ahnperper >= 100.1)
+            and (ttlamt >= ttlamtahn and ahnttlper >= 100.1) and (BTCdiff > 10 and BTCdiffold > 10 and BTCdiffold - BTCdiffoldold > 10)):
         sleepahn = 60*1
-        print(ahndate1, ahndate2, " 알림3 상승 **행동 개시** 추세 200 300 500 500 100.1 BTCdiff > 10 cnt(",
+        print(ahndate1, ahndate2, " 알림3 상승 **행동 개시** 추세 +str(ttlamtahn) 300 500 500 100.1 BTCdiff > 10 cnt(",
               marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
               "%) BTCdiff=(",BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  알림3 상승  **행동 개시** 추세  200 300 500 200 100.1 BTCdiff > 10 cnt(" + str(
+            p = ahndate1 + " " + ahndate2 + "  알림3 상승  **행동 개시** 추세  +str(ttlamtahn) 300 500 200 100.1 BTCdiff > 10 cnt(" + str(
                 marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
                 marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
                 marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
@@ -735,16 +739,16 @@ while 1:
     # --------------------------------------------------------------------
     # if ((marketcnt >= 100 and ahncntper >= 150) or (marketamt >= 100 and ahnamtper >= 150) or (marketper >= 100 and ahnperper >= 150)):
     if (((marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50))
-            and (ttlamt >= 200 and ahnttlper >= 100.1) and (BTCdiff < -10 and BTCdiffold <-10 and BTCdiffold - BTCdiffoldold < -10)):
+            and (ttlamt >= ttlamtahn and ahnttlper >= 100.1) and (BTCdiff < -10 and BTCdiffold <-10 and BTCdiffold - BTCdiffoldold < -10)):
         sleepahn = 60*1
-        print(ahndate1, ahndate2, " 알림4 하락  **행동 개시** 추세 200 300 500 200 102 BTCdiff > 10 cnt(",
+        print(ahndate1, ahndate2, " 알림4 하락  **행동 개시** 추세 +str(ttlamtahn) 300 500 200 102 BTCdiff > 10 cnt(",
               marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
               "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
               "%) BTCdiff=(",BTCdiff, BTCdiffold, BTCdiffoldold, BTCdiffold - BTCdiffoldold, ") ", ahnresult)
         # ----------------------------------------------------
         # ----------------------------------------------------
         with open("C:/Users/ahnss/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
-            p = ahndate1 + " " + ahndate2 + "  알림4 하락  **행동 개시** 추세  200 300 500 500 102 BTCdiff > 10 cnt(" + str(
+            p = ahndate1 + " " + ahndate2 + "  알림4 하락  **행동 개시** 추세  +str(ttlamtahn) 300 500 500 102 BTCdiff > 10 cnt(" + str(
                 marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
                 marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
                 marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
@@ -831,7 +835,7 @@ while 1:
     # ---------------------------------------------------
     #print(ahndate1,ahndate2," (", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, ")(",BTCdiff,BTCdiffold,BTCdiffoldold,(BTCdiffold-BTCdiffoldold),") cnt(", buycnt,
     print(ahndate1, ahndate2," [ttlamt=",ttlamt,"] (", BTCpriceNow, BTCprice, BTCmaxprice, BTCminprice, ")(", BTCdiff,BTCdiffold,BTCdiffoldold, (BTCdiffold - BTCdiffoldold), ") cnt(", buycnt,
-                "/", sellcnt,marketcnt,ahncntper,"%) amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T(" ,marketper,ahnperper,"%",
+                "/", sellcnt,marketcnt,ahncntper,"%) amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T(" ,marketper,ahnperper,"%) (",
           ttlamt,ahnttlper,"%)",ahnresult,result11,result12)
     # ---------------------------------------------------
     # ---------------------------------------------------
@@ -1103,8 +1107,8 @@ while 1:
     graphfile.close()
     # ------------------------------------------------------------------------------------
     if (now.hour >= 8 and now.hour <= 19):
-        #sleepsec = 1800 #30분
-        sleepsec = 3600
+        sleepsec = 1800 #30분
+        #sleepsec = 3600
     else:
         sleepsec = 3600  #1시간
     if(sleepahn > 0):
