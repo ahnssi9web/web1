@@ -18,6 +18,23 @@
 
 <body> 
 
+4.2 Alternatives
+<audio id="audio1" controls>
+  <source src="audio/guitar.mp3">
+  <source src="audio/guitar.ogg">
+  <source src="audio/guitar.m4a">
+  <source src="audio/guitar.wav">
+Your browser doesn't support HTML5. Maybe you should upgrade.
+</audio>
+4.3 Simple background music
+<audio id="my_song" autoplay loop>
+ <source src="audio/guitar.mp3">
+ <source src="audio/guitar.ogg">
+ <source src="audio/guitar.m4a">
+ <source src="audio/guitar.wav">
+ Your browser doesn't support HTML5. Maybe you should upgrade.
+</audio>
+
 
       <img src="제주도취소/방배동 코로나 대책.png">
       <video controls autoplay witdh="400px" src="제주도취소/상록수.mp4"></video><br><br>
