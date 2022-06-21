@@ -1,0 +1,2092 @@
+import requests
+from time import sleep
+import datetime
+# from datetime import datetime
+#now = datetime.now()
+#print(now.hour)
+#print("지금은", now.year, "년", now.month, "월", now.day, "일", now.hour, "시", now.minute, "분", now.second, "초입니다. \n")
+
+
+import os
+import os.path
+
+import csv
+import json
+import shutil
+
+import openpyxl
+from openpyxl.chart import BarChart,LineChart,Series,Reference
+from openpyxl.styles import Font, Alignment
+from openpyxl.styles import Border, Side, Color, PatternFill
+
+import winsound as ws
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+
+#---------------------------------------------------------
+#       어떤 값을 20-100사이로 변환하는 방법
+#       최소값을 0으로 최대값을 100으로 하면 되겠지
+#       중간값은 50이 되겠지.
+#   예  -100 ~ +200 사이의 값을 20-100으로 바꾸려면
+#    총길이 300 (200 - -100) 어떤값 x는 300-x
+#    변환시키려는 길이는 80 (100-20)
+#    그러므로 300 : 80 = 300-x : y
+#  300y = 80*(300-x)  y=80*(300-x)/300
+#  점검 x=150이면 y=80*(300-150)/300=80*150/300=40 합격!!!
+#  일반화 시키면 -100 min1   +200 max1
+#                20 min2    100 max2
+#              y=(max2-min2)*(max1-min1-x)/(max1-min1)
+#---------------------------------------------------------
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/korbit.csv")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/korbit.csv", mode="w", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    writer.writerow(['nowDatetime', 'type', 'price', 'amount','tid', 'time', 'length'])
+    print(" make korbit.csv first line --> nowDatetime type  price  amount tid time len(dict) ")
+    f.close()
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/BTCfile.xlsx")
+if v == False:
+    BTCfile = openpyxl.Workbook()
+    BTCfile.create_sheet()
+    BTCSheet = BTCfile['Sheet']
+    BTCSheet.cell(1, 1).value = 'nowDatetime'
+    BTCSheet.cell(1, 2).value = 'BTCpriceNow'
+    BTCSheet.cell(1, 3).value = 'BTCprice'
+    BTCSheet.cell(1, 4).value = 'BTCdiff' #BTCmaxprice'
+    BTCSheet.cell(1, 5).value = 'BTCdiffold'  #BTCminprice'
+    BTCSheet.cell(1, 6).value = 'BTCdiffoldold'  # ??? 그냥 앞의 것 읽어들이면 되지 않을까?
+    BTCSheet.cell(1, 7).value = 'nowDatetime' # 중복이니 없애도 됨
+    BTCSheet.cell(1, 8).value = 'buycnt'
+    BTCSheet.cell(1, 9).value = 'sellcnt'
+    BTCSheet.cell(1, 10).value = 'nowDatetime'  # 중복이니 없애도 됨
+    BTCSheet.cell(1, 11).value = 'buyamt'
+    BTCSheet.cell(1, 12).value = 'sellamt'
+    BTCSheet.cell(1, 13).value = 'ttlamt'
+    # ---------------------------------------------------
+    BTCSheet.cell(1, 14).value = 'nowDatetime'  # 중복이니 없애도 됨
+    BTCSheet.cell(1, 15).value = 'marketcnt'
+    BTCSheet.cell(1, 16).value = 'marketamt'
+    BTCSheet.cell(1, 17).value = 'marketper'
+    BTCSheet.cell(1, 18).value = 'nowDatetime'  # 중복이니 없애도 됨
+    BTCSheet.cell(1, 19).value = 'ahncntper'
+    BTCSheet.cell(1, 20).value = 'ahnamtper'
+    BTCSheet.cell(1, 21).value = 'ahnttlper'
+    BTCSheet.cell(1, 22).value = 'ahnperper'
+    BTCSheet.cell(1, 23).value = 'BTCdiff'  # 이것은 왜?  없애도 될 듯  위와 같이 표시하려고
+    BTCSheet.cell(1, 24).value = 'ahnresult'
+    BTCSheet.cell(1, 25).value = 'result11'
+    BTCSheet.cell(1, 26).value = 'result12'
+    BTCSheet.cell(1, 27).value = 'BTCpriceNow' # 이것은 인정 연속 데이타로 표시해야 되므로
+    BTCSheet.cell(1, 28).value = 'newBTCavg'
+    BTCSheet.cell(1, 29).value = 'oldBTCavg'
+    BTCSheet.cell(1, 30).value = 'new-old'
+    BTCSheet.cell(1, 31).value = 'BTCpriceNow'   # 이것은 인정 연속 데이타로 표시해야 되므로
+    BTCSheet.cell(1, 32).value = 'ttlamt'
+    BTCSheet.cell(1, 33).value = 'ahnttlper'
+    BTCSheet.cell(1, 34).value = 'newmaxBTC'
+    BTCSheet.cell(1, 35).value = 'oldmaxBTC'
+    BTCSheet.cell(1, 36).value = 'newminBTC'
+    BTCSheet.cell(1, 37).value = 'oldminBTC'
+    BTCSheet.cell(1, 38).value = 'maxdiff'
+    BTCSheet.cell(1, 39).value = 'mindiff'
+    BTCSheet.cell(1, 40).value = 'BTCpriceNow'  # 이것은 인정 연속 데이타로 표시해야 되므로
+    BTCSheet.cell(1, 41).value = 'ttlamt'
+    BTCSheet.cell(1, 42).value = 'ahnttlper'
+    BTCSheet.cell(1, 43).value = '(BTCpriceNow-BTCpriceNowold)'
+    BTCSheet.cell(1, 44).value = '(BTCdiff-BTCdiffold)'
+    BTCSheet.cell(1, 45).value = '(newBTCavg-newBTCavgold)'
+    BTCSheet.cell(1, 46).value = '(newmaxBTC-oldmaxBTC)'
+    BTCSheet.cell(1, 47).value = 'BTCpriceNow'   # 이것은 인정 연속 데이타로 표시해야 되므로
+    BTCSheet.cell(1, 48).value = 'mn-BTCpriceNow'
+    BTCSheet.cell(1, 49).value = 'mn-ttlamt'
+    BTCSheet.cell(1, 50).value = 'ttlamt'
+    BTCSheet.cell(1, 51).value = 'buyamt5000'
+    BTCSheet.cell(1, 52).value = 'ttlamt5000'
+    BTCSheet.cell(1, 53).value = 'mn-ttlamt5000'
+    BTCSheet.cell(1, 54).value = 'marketcnt5000'
+    BTCSheet.cell(1, 55).value = 'BTCpriceNow'
+    BTCSheet.cell(1, 56).value = 'mn_BTCprice'
+    BTCSheet.cell(1, 57).value = 'marketamt5000'
+    # ---------------------------------------------------
+    BTCSheet.cell(1, 58).value = 'buyPrice'
+    BTCSheet.cell(1, 59).value = 'sellPrice'
+    BTCSheet.cell(1, 60).value = 'BTCpriceNow'
+    # ---------------------------------------------------
+    print(" make BTCfile.xlsx --> nowDatetime  BTCpriceNow BTCprice BTCpriceMAX ")
+    BTCfile.save('C:/Users/ahnssi9/Desktop/BTCfile.xlsx')
+    BTCfile.close()
+    # ---------------------------------------------------
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/graphfile.xlsx")
+if v == False:
+    graphfile = openpyxl.Workbook()
+    graphfile.create_sheet("Sheet1")
+    graphfile.create_sheet("Sheet2")
+    print(" make graphfile.xlsx-->  nowDatetime BTCpriceNow BTCprice BTCpriceMAX ")
+    graphfile.save('C:/Users/ahnssi9/Desktop/graphfile.xlsx')
+    graphfile.close()
+    # ---------------------------------------------------
+
+# ---------------------------------------------------
+# ---------------------------------------------------
+
+v = os.path.isfile("C:/Users/ahnssi9/Desktop/BTCtxt.txt")
+if v == False:
+    f = open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="w")
+    p = " date  time  BTCpriceNow BTCprice BTCdiff BTCdiffold BTCdiffoldold  buycnt sellcnt marketcnt ahncntper buyamt sellamt marketamt ahnamtper ttlamt ahnttlper marketper ahnperper  ahnresult  result11 result12 \n"
+    print(" make BTCtxt.txt  --> Date time  BTCpriceNow BTCprice BTCdiff")
+    f.write(p)
+    f.close()
+# ---------------------------------------------------
+# ---------------------------------------------------
+
+
+# ================= 이승준 강사의 설명문 =======================================
+class color:
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+    RED = '\033[91m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    YELLOW = '\033[93m'
+
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+
+    ENDC = '\033[0m'
+
+
+# Font: 맑은고딕 크기15 굵게
+font_15 = Font(name='궁서체', size=15, bold=True)
+
+# Alignment; 가로 세로 가운데 정렬
+align_center = Alignment(horizontal='center', vertical='center')
+align_vcenter = Alignment(vertical='center')
+
+# Border 테두리 지정
+border_thin = Border(left=Side(style='thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
+
+# PatternFill 셀 색상 지정
+fill_orange = PatternFill(patternType='solid', fgColor=Color('FFC000'))
+fill_lightgrey = PatternFill(patternType='solid', fgColor=Color('D3D3D3'))
+# ================= 이승준 강사의 설명문 =======================================
+
+sleepahn = 0
+sleepsec = 0
+
+# ---------------------------------------------------
+while 1:
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    BTCmaxprice = 0
+    BTCminprice = 90000000   #주의
+    BTCdiff = 0
+    # ------------------------------------------------------------------------------------
+    now = datetime.datetime.now()
+    nowDatetime = now.strftime('%Y-%m-%d %H:%M:%S')
+    ahndate1 = nowDatetime[5:11]
+    ahndate2 = nowDatetime[11:16]
+    ahndate  = ahndate1 + '/' + ahndate2
+    #print(ahndate)
+    nowDatetime = ahndate  # 날짜와 시분만 표시
+    #nowDatetime = ahndate2  # 시분만 표시하자
+    #===============================================================
+    # graph가 중첩되어 시간도 많이 걸리고 복잡하므로 Sheet1을 지우고 새로 만들어 사용
+    #===============================================================
+    #print(graphfile.sheetnames)
+    graphfile = openpyxl.load_workbook(filename="C:/Users/ahnssi9/Desktop/graphfile.xlsx", data_only=True)
+    graphSheet = graphfile['Sheet1']
+    graphfile.remove(graphSheet)
+    graphfile.save("C:/Users/ahnssi9/Desktop/graphfile.xlsx")
+    #print(graphfile.sheetnames)
+
+    graphfile.create_sheet("Sheet1")
+    #print(graphfile.sheetnames)
+    graphfile.save("C:/Users/ahnssi9/Desktop/graphfile.xlsx")
+    graphfile.close()
+    # ----------------------------------------------------------
+    # korbit.csv를 열고 데이타의 총갯수를 알아낸다
+    # ----------------------------------------------------------
+    # ----------------------------------------------------------
+    f = open('C:/Users/ahnssi9/Desktop/korbit.csv', 'r')
+    rdr = csv.DictReader(f)
+    m = -1
+    tidcnt = 0
+    ahnkorbit= []
+    # ----------------------------------------------------------
+    # korbit.csv 전부를 읽은 rdr을 ahnkorbit[] 딕셔너리에 저장-- tid 같은 것 중복 기록 안하려고.... 10만개 전의 자료 구하려고
+    # ----------------------------------------------------------
+    for line in rdr:
+        m = m + 1
+        ahnkorbit.append([])
+        ahnkorbit[m].append(line['type'])
+        ahnkorbit[m].append(line['price'])
+        ahnkorbit[m].append(line['amount'])
+        ahnkorbit[m].append(line['tid'])
+        #print(line,m,ahnkorbit[m][0], ahnkorbit[m][1], ahnkorbit[m][2],ahnkorbit[m][3])
+    #=====================================================
+    ttllinekorbit = m+2   #  korbit.csv 숫자
+    f.close()
+    #print(" 0 ---->> ttllinekorbit=",ttllinekorbit,ahnkorbit[m][0],ahnkorbit[m][1],ahnkorbit[m][2],ahnkorbit[m][3])
+    #==================================================================
+    # KORBIT OPEN API DATA를 읽어온다. dict에 저장
+    #==================================================================
+    req = requests.get('https://api.korbit.co.kr/v1/transactions')
+    dict = json.loads(req.text)
+    #print(req.text)
+    #-------------------------------------------------------------------------------
+    # korbit data 구조 ---> 여러개를 리스트로 만들어서 저장함
+    #   [{"timestamp":1625969554661,"tid":"11777395","price":"39763000","amount":"0.0001337","type":"buy"},
+    #    {"timestamp":1625969544303,"tid":"11777394","price":"39769000","amount":"0.00099771","type":"buy"},
+    #    {"timestamp":1625969531685,"tid":"11777393","price":"39738000","amount":"0.001","type":"sell"},
+    #-------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
+    f = open("C:/Users/ahnssi9/Desktop/korbit.csv", "a", encoding="cp949", newline='')
+    writer = csv.writer(f)
+    # 한번 읽어오면 약150-200개 사이임 len(dict)
+    for i in range(len(dict)-1,1, -1):  # 가장 뒤가 오래된 것이라 거꾸로 읽어 들어감
+        timestamp = dict[i].get('timestamp')
+        Korbitdate = datetime.datetime.fromtimestamp(timestamp / 1000).date()
+        Korbittime = datetime.datetime.fromtimestamp(timestamp / 1000).time()
+        ahndatetime = str(Korbitdate) + "/" + str(Korbittime)
+        # print(i, Korbittime,Kordate1,Kordate2,"  kordate=",Kordate)  # 2015-04-19 12:11:32
+        #print(i, ahndatetime,"--",str(Korbitdate)+str(Korbittime))  # 2015-04-19 12:11:32
+
+        type = dict[i].get('type')
+        price = dict[i].get('price')
+        amount = dict[i].get('amount')
+        tid = dict[i].get('tid')
+
+        k=999
+        #print(" 1 -----***  i=",i)
+        for k in range(ttllinekorbit - 1000, ttllinekorbit):  # 최근 1000개중에 같은 것이 있는지 확인하자
+            #print(" 2  ----->>>    ttllinekorbit=",ttllinekorbit, "   k=",  k)
+            if (k == ttllinekorbit-1):
+                tidcnt = tidcnt + 1
+                #print(" 3 ===============>>>  마지막까지 점검해도 같은 것 없으니 기록하고 다음  k 2번 나와라    ",  k, "  tidcnt = ", tidcnt)
+                writer.writerow([ahndatetime, type, price, amount, tid])  # 새 것이니 korbit.csv에 추가
+            # print(" 4 ---> 1000개를 계속 점검하다가 같은 tid가 나오면 멈추고 다음번 k로 다시 시작 즉 for문 2번 print문")
+            if (tid == ahnkorbit[k-1][3]):
+                #print(" 5  tid 같은 것 발견 다음 k로 2번 나와라  ----->>>  k=", k, "     tid=", tid,"  ahnkorbit[k][3]=", ahnkorbit[k-1][3])
+                break
+            #print(" 6 다음  k =", k)
+    #print(" 7    읽어온 레코드=", len(dict), "     기록한 레코드=", tidcnt, "     중복된 레코드=", len(dict) - tidcnt)
+    #-------------------------------------------------------------------------------
+    f.close()  # Korbit.csv 역할은 끝. 이제 파일을 닫자
+    # ----------------------------------------------------------
+    # ahnkorbit[]에 들어있는 korbit.csv 자료를 이용하여 온갖것을 찾아내면 됨
+    # ----------------------------------------------------------
+    # ----------------------------------------------------------
+    BTCpriceNow = price  # 가장 최근의 가격
+    #print("--- BTCpriceNow : ", BTCpriceNow)
+    # ----------------------------------------------------------
+    # ----------------------------------------------------------
+    BTCprice = 0
+    buycnt = 0
+    sellcnt = 0
+
+    buyPrice = 0
+    sellPrice = 0
+
+    buyamt = 0
+    sellamt = 0
+    ttlamt = 0
+
+    marketcnt = 0
+    marketamt = 0
+    marketprice = 0
+    #==========================================================
+    i = 0
+    BTCpricettl = 0
+    # -------------------------------------------------
+    # 한 번에 200개씩 읽어옴 1시간 단위 측정하며  10시간에 2,000개  24시간에 5,000개 2일 10,000개
+    # ------------------------------------------------------------------------------------
+    # ttllinecnt = 10000  # 2일 약10,000개
+    # ttlamtahn = 300
+    # updndev = 5
+    # ----------------------------------------------------
+    ttllinecnt = 1000  # 5시간
+    ahnamt = 20
+    ahn10 = 5 # 10	# mn_ttlamt의 10배 이상이어야...
+    updndev = 5
+    # ----------------------------------------------------
+    BTCahn = 5000
+    graphcnt = 30
+    # ---------------------------------------------------
+    #  한달전 10만개 전의 1000개를 읽어서 총거래량과 가격평균을 알아보기
+    # ----------------------------------------------------
+    mn_ttlamt = 0
+    mn_BTCpricettl = 0
+    mn_cnt=0
+    #for i in range(1, ttlline):
+    for i in range(ttllinekorbit -100000, ttllinekorbit -100000+ttllinecnt):
+         mn_ttlamt = mn_ttlamt + float(ahnkorbit[i][2])
+         mn_BTCpricettl = mn_BTCpricettl + float(ahnkorbit[i][1])
+         mn_cnt=mn_cnt+1
+    # ----------------------------------------------------
+    mn_BTCprice = mn_BTCpricettl/mn_cnt
+    mn_BTCprice = round(float(mn_BTCprice) / 1000000, 0)
+    mn_ttlamt = round(float(mn_ttlamt), 0)
+
+    mn_BTCprice = int(mn_BTCprice)
+    mn_ttlamt = int(mn_ttlamt)
+    # ---------------------------------------------------
+    #print("mn_cnt=",mn_cnt," mn_ttlamt=",mn_ttlamt," mn_BTCpirce=",mn_BTCprice)
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
+    #for i in range(1, ttlline):
+    for i in range(ttllinekorbit-ttllinecnt, ttllinekorbit-1):
+        #print(i, " ----- ",ahnkorbit[i][0],"=====", ahnkorbit[i])
+        if (float(ahnkorbit[i][1]) > BTCmaxprice):
+            BTCmaxprice = float(ahnkorbit[i][1])
+        if (float(ahnkorbit[i][1]) < BTCminprice):
+            BTCminprice = float(ahnkorbit[i][1])
+        #BTCdiff = BTCmaxprice - BTCminprice
+
+        #print("--- BTCprice : ", ahnkorbit[i][1])
+        #print(i, " =======>    BTCprice :", float(ahnkorbit[i][1]), " BTCmaxprice :", BTCmaxprice, " - ", BTCminprice, " = ", BTCdiff)
+        # if (BTCmaxprice == 0):
+        #    BTCmaxprice = BTCprice + 50
+        # if (BTCminprice == 0):
+        #    BTCminprice = BTCprice - 50
+        #if (BTCdiff == 0):
+        #    BTCdiff = 100
+
+        if (ahnkorbit[i][0] == 'buy'):
+
+            buyPrice = buyPrice + float(ahnkorbit[i][1])
+            buycnt = buycnt + 1
+            buyamt = buyamt + float(ahnkorbit[i][2])
+            BTCpricettl = BTCpricettl + float(ahnkorbit[i][1])
+            #print("--- BTCprice : ", float(ahnkorbit[i][1]), " - buycnt : ", buycnt, " ---- amount = ", line['amount'], " ---- buyamt : ", buyamt)
+        else:
+
+            sellPrice = sellPrice + float(ahnkorbit[i][1])
+            sellcnt = sellcnt + 1
+            sellamt = sellamt + float(ahnkorbit[i][2])
+            BTCpricettl = BTCpricettl + float(ahnkorbit[i][1])
+            #print("--- sellcnt : ", sellcnt, " ---- amount = ", line['amount'], " ---- sellamt : ", sellamt)
+    ttlamt = buyamt + sellamt
+    #print("--- BTCpriceNow : ", BTCpriceNow, " ---- BTCprice = ", BTCprice, " ---- ")
+    BTCprice = BTCpricettl / (buycnt + sellcnt)
+    buyPrice = buyPrice/buycnt
+    sellPrice = sellPrice/sellcnt
+    # ---------------------------------------------------
+    BTCpriceNow = round(float((BTCpriceNow)) / 10000, 0)
+    BTCprice = round(float((BTCprice)) / 10000, 0)
+    BTCpriceNow = int(BTCpriceNow)
+    BTCprice = int(BTCprice)
+
+    buyPrice = round(float((buyPrice)) / 10000, 0)
+    sellPrice = round(float((sellPrice)) / 10000, 0)
+    buyPrice = int(buyPrice)
+    sellPrice = int(sellPrice)
+    # print(" ---- BTCprice = ",BTCprice," ---- buyPrice : ",buyPrice," --- sellPrice : ",sellPrice)
+
+    BTCdiff = BTCpriceNow - BTCprice
+    BTCdiff = BTCahn + BTCdiff  #5000 BTCahn
+    BTCdiff = int(BTCdiff)
+    BTCdiffold = 0  # 아래에서 나옴
+    BTCdiffoldold = 0  # 아래에서 나옴
+
+    #print("0 BTCpriceNow-BTCpriceNowpld = (", BTCpriceNow, "-", BTCpriceNowold, "=", BTCpricediff,
+    #      ")   BTCpriceNow-BTCprice=(", BTCpriceNow, "-", BTCprice, "=", BTCdiff, ")")
+
+    # ---------------------------------------------------
+    BTCmaxprice = round(float((BTCmaxprice)) / 10000, 0)
+    BTCminprice = round(float((BTCminprice)) / 10000, 0)
+    BTCmaxprice = int(BTCmaxprice)
+    BTCminprice = int(BTCminprice)
+
+
+    #print("1 BTCpriceNow-BTCpriceNowpld = (", BTCpriceNow,"-",BTCpriceNowold,"=",BTCpricediff,")   BTCpriceNow-BTCprice=(",BTCpriceNow,"-",BTCprice,"=",BTCdiff,")")
+    # ---------------------------------------------------
+    #print(ahndate1, ahndate2, " =======> ", BTCpriceNow, "   ", BTCprice, "   BTCmaxprice :", BTCmaxprice, " = ", BTCminprice, " BTCdiff=", BTCdiff," BTCdiffold=", BTCdiffold)
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    #print("-----------korbit  end of line ---")
+    #print(ahndate1 ,ahndate2 ,"--- 11 korbit  BTC 가격 : ",float(ahnkorbit[i][1]), " 최근 BTC 1000개 buy : ", buycnt, " 수량 : ", buyamt," <<<>>>  sell : ", sellcnt, " 수량 : ", sellamt)
+    #print("--- BTCpriceNow : ", BTCpriceNow, " ---- BTCprice = ", BTCprice, " ---- (buycnt+sellcnt)=",(buycnt+sellcnt))
+    marketper = 0
+    #=============== 최근 자료 buy sell 주문건수 비교 buy가 많으면 상승장 판단
+    if (buycnt > 0 and sellcnt > 0):
+        marketcnt =  buycnt/sellcnt*100
+        marketper = marketcnt
+        #print(" ---marketcnt = ", marketcnt,"  sellcnt=", sellcnt, "  buycnt=", buycnt)
+
+    if (marketcnt > 500):
+        result11 = "상승"
+        ahnres11 = 30
+        #print("--- marketcnt 장-----")
+    elif (marketcnt < 500 and marketcnt > 50):
+        result11 = "보합"
+        ahnres11 = 20
+    #    #print("--- marketcnt 보합-----")
+    else:
+        result11 = "하락"
+        ahnres11 = 10
+    #    #print("--- marketcnt 하락장-----")
+
+    #=============== 최근 자료의 buy sell 주문수량 비교 buy가 많으면 상승장 판단
+    if (sellamt > 0):
+        marketamt =  buyamt/sellamt*100
+        marketper = marketper + marketamt
+    #--------------------------------------------------------------------------
+    #print(" ---marketamt = ", marketamt, "  buycnt=", buycnt, " buyamt=", buyamt, "  sellcnt=", sellcnt, "   sellamt=", sellamt)
+    if (marketamt > 800):
+        result12 = "상상승"
+        ahnres12 = 60
+        #print("--- marketamt 상승장-----")
+    elif (marketamt < 800 and marketamt > 50):
+        result12 = "보보합"
+        ahnres12 = 40
+        #print("--- marketamt 보합-----")
+    else:
+        result12 = "하하락"
+        ahnres12 = 20
+        #print("--- marketamt 하락장-----")
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+
+    # ----------------------------------------------------
+    ahnresult  = ahnres11+ahnres12
+    # ----------------------------------------------------
+    # 그래픽용 --- 10,000개를 합산하니 크기가 커서  100으로 나누어 100단위로 만듬
+    #------------------------------------------------------------------
+
+
+    buyamt= round(float(buyamt), 2)
+    sellamt= round(float(sellamt), 2)
+    ttlamt = buyamt + sellamt
+    ttlamt = round(float(ttlamt),2)
+    buyamt = int(buyamt)
+    sellamt = int(sellamt)
+    ttlamt = int(ttlamt)
+
+    marketcnt = round(float(marketcnt),0)
+    marketamt = round(float(marketamt),0)
+    marketper = round(float(marketper),0)
+
+    marketcnt = int(marketcnt)
+    marketamt = int(marketamt)
+    marketper = int(marketper)
+    # ========================================================================================================
+    ahncntper = 0
+    ahnamtper = 0
+    ahnttlper = 0
+    ahnperper = 0
+    # ========================================================================================================
+
+
+    # ========================================================================================================
+    #  기존 엑셀 파일 불러와서 100개만 graphfile.xlsx에 저장하고 그래프 만들기
+    BTCfile = openpyxl.load_workbook(filename="C:/Users/ahnssi9/Desktop/BTCfile.xlsx", data_only=True)
+    BTCSheet = BTCfile['Sheet']
+    lenBTCSheet = len(BTCSheet['A'])  # BTCfile.xlsx 저장된 갯수
+    #print(" BTC lenBTCSheet=",lenBTCSheet)
+    #------------------------------------------------------------------
+    BTCpriceNowold = BTCSheet.cell(lenBTCSheet, 2).value
+    BTCpriceold = BTCSheet.cell(lenBTCSheet, 3).value
+    BTCdiffold = BTCSheet.cell(lenBTCSheet, 4).value
+    BTCdiffoldold = BTCSheet.cell(lenBTCSheet-1, 4).value
+    ttlamtold = BTCSheet.cell(lenBTCSheet, 13).value
+    marketcntold = BTCSheet.cell(lenBTCSheet, 15).value
+    marketamtold = BTCSheet.cell(lenBTCSheet, 16).value
+    marketperold = BTCSheet.cell(lenBTCSheet, 17).value
+
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ========================================================================================================
+
+    # ========================================================================================================
+
+    # ========================================================================================================
+    #print(ahndate1, ahndate2, " 1     BTCdiff=",BTCdiff, "    BTCdiffold=", BTCdiffold, "    BTCdiffoldold=", BTCdiffoldold)
+    # ----------------------------------------------------
+    # ========================================================================================================
+    #print(ahndate1, ahndate2, " 2     BTCdiff=",BTCdiff, "    BTCdiffold=", BTCdiffold, "    BTCdiffoldold=", BTCdiffoldold)
+    # ----------------------------------------------------
+    #ttlamtold =1
+    # ---------------------------------------------------
+    if (marketcntold >0):
+        ahncntper = marketcnt / marketcntold * 100
+    if (marketamtold>0):
+        ahnamtper = marketamt / marketamtold * 100
+    if (marketperold >0):
+        ahnperper = marketper / marketperold * 100
+    if (ttlamtold >0):
+        ahnttlper = ttlamt / ttlamtold * 100
+
+    ahncntper = round(float(ahncntper),1)
+    ahnamtper = round(float(ahnamtper),1)
+    ahnperper = round(float(ahnperper),1)
+    ahnttlper = round(float(ahnttlper),1)
+
+    # ========================================================================================================
+    #print(ahndate1, ahndate2, " 3     BTCdiff=",BTCdiff, "    BTCdiffold=", BTCdiffold, "    BTCdiffoldold=", BTCdiffoldold)
+    #print(ahndate1, ahndate2, " 99     oldmaxBTC=",oldmaxBTC, "    newmaxBTC=", newmaxBTC, "    oldminBTC=", oldminBTC, "    newminBTC=", newminBTC)
+    # ----------------------------------------------------
+    oldmaxBTC = 0
+    newmaxBTC = 0
+
+    oldminBTC=99999
+    newminBTC=99999
+    oldBTCavg = 0
+    oldBTCavgold = 0
+    oldBTCavgoldold = 0
+    newBTCavg = 0
+    newBTCavgold = 0
+    newBTCavgoldold = 0
+    oldcnt = 0
+    newcnt = 0
+    for i in range(lenBTCSheet - 20, lenBTCSheet - 10):
+        tmpdata = BTCSheet.cell(i, 2).value
+        oldBTCavg = oldBTCavg + tmpdata
+        oldcnt = oldcnt + 1
+        if tmpdata > oldmaxBTC:
+            oldmaxBTC = tmpdata
+        if tmpdata < oldminBTC:
+            oldminBTC = tmpdata
+        #print(ahndate1, ahndate2, " 81     i=",i," tmpdata=",tmpdata)
+
+    for i in range(lenBTCSheet - 5, lenBTCSheet):
+        tmpdata = BTCSheet.cell(i, 2).value
+        newBTCavg = newBTCavg + tmpdata
+        newcnt = newcnt + 1
+        if tmpdata > newmaxBTC:
+            newmaxBTC = tmpdata
+        if tmpdata < newminBTC:
+            newminBTC = tmpdata
+        #print(ahndate1, ahndate2, " 82     i=",i," tmpdata=",tmpdata)
+
+    newmaxBTC = int(newmaxBTC)
+    oldmaxBTC = int(oldmaxBTC)
+    maxdiff = int(newmaxBTC-oldmaxBTC)
+    newminBTC = int(newminBTC)
+    oldminBTC = int(oldminBTC)
+    maxdiff = int(newminBTC-oldminBTC)
+    # ========================================================================================================
+    #print(ahndate1, ahndate2, lenBTCSheet," 91     newBTCavg=", newBTCavg, newBTCavgold, newBTCavgoldold, "    newcnt=", newcnt,"  oldBTCavg=",oldBTCavg,oldBTCavgold,oldBTCavgoldold, "    oldcnt=", oldcnt, "   ")
+
+    newBTCavgold = BTCSheet.cell(lenBTCSheet-1, 28).value
+    newBTCavgoldold = BTCSheet.cell(lenBTCSheet-2, 28).value
+    oldBTCavgold = BTCSheet.cell(lenBTCSheet-1, 29).value
+    oldBTCavgoldold = BTCSheet.cell(lenBTCSheet-2, 29).value
+
+    oldBTCavg = int(oldBTCavg/oldcnt)
+    newBTCavg = int(newBTCavg/newcnt)
+    avgdiff = int(newBTCavg-oldBTCavg)
+    # ========================================================================================================
+    #print(ahndate1, ahndate2, lenBTCSheet," 92     newBTCavg=", newBTCavg, newBTCavgold, newBTCavgoldold, "    newcnt=", newcnt,"  oldBTCavg=",oldBTCavg,oldBTCavgold,oldBTCavgoldold, "    oldcnt=", oldcnt, "   ")
+    # print(ahndate1, ahndate2, " 99     oldmaxBTC=",oldmaxBTC, "    newmaxBTC=", newmaxBTC, "    oldminBTC=", oldminBTC, "    newminBTC=", newminBTC)
+    # ----------------------------------------------------
+    newmaxBTC = int(newmaxBTC)
+    oldmaxBTC = int(oldmaxBTC)
+    maxdiff = int(newmaxBTC - oldmaxBTC)
+    newminBTC = int(newminBTC)
+    oldminBTC = int(oldminBTC)
+    mindiff = int(newminBTC - oldminBTC)
+    # ---------------------------------------------------------
+    #  일반화 시키면 -200 min1   +200 max1
+    #                20 min2    100 max2
+    #              y=(max2-min2)*(max1-min1-x)/(max1-min1)
+    #              y=80*(400-x)/400
+    # ---------------------------------------------------------
+    #                0 min2    50 max2      # 50부근으로
+    #              y=(max2-min2)*(max1-min1-x)/(max1-min1)
+    #              y=50*(400-x)/400
+    # ---------------------------------------------------------
+    BTCpricediffahn = 50*(400-(BTCpriceNow-BTCpriceNowold))/400
+    BTCdiffahn = 50*(400-(BTCdiff-BTCdiffold))/400
+    newavgahn = 50*(400-(newBTCavg-newBTCavgold))/400
+    maxBTCahn = 50*(400-(newmaxBTC-oldmaxBTC))/400
+
+    # ---------------------------------------------------------
+    #buycnt5000 = 5000+buycnt-1000
+    marketcnt5000 = 5000+marketcnt-100
+    marketamt5000 = 5000+marketamt-100
+    buyamt5000 = 5000+buyamt-500
+    ttlamt5000 = 5000+ttlamt-200
+    mn_ttlamt5000 = 5000+mn_ttlamt-200
+    #print(BTCpriceNow," ",ttlamt," ",ttlamt5000," ",buyamt," ",buyamt5000," ",buycnt," ",buycnt5000)
+    # ---------------------------------------------------
+    BTCSheet.cell(lenBTCSheet+1, 1).value = nowDatetime	# 마지막에 방금 읽어오고 계산한 것 추가한다.
+    BTCSheet.cell(lenBTCSheet+1, 2).value = BTCpriceNow
+    BTCSheet.cell(lenBTCSheet+1, 3).value = BTCprice
+    BTCSheet.cell(lenBTCSheet+1, 4).value = BTCdiff #BTCpricediffold #BTCmaxprice
+    BTCSheet.cell(lenBTCSheet+1, 5).value = BTCdiffold   #BTCminprice
+    BTCSheet.cell(lenBTCSheet+1, 6).value = BTCdiffoldold
+    BTCSheet.cell(lenBTCSheet+1, 7).value = nowDatetime
+    BTCSheet.cell(lenBTCSheet+1, 8).value = buycnt
+    BTCSheet.cell(lenBTCSheet+1, 9).value = sellcnt
+    BTCSheet.cell(lenBTCSheet+1, 10).value = nowDatetime
+    BTCSheet.cell(lenBTCSheet+1, 11).value = buyamt
+    BTCSheet.cell(lenBTCSheet+1, 12).value = sellamt
+    BTCSheet.cell(lenBTCSheet+1, 13).value = ttlamt
+    BTCSheet.cell(lenBTCSheet+1, 14).value = nowDatetime
+    BTCSheet.cell(lenBTCSheet+1, 15).value = marketcnt
+    BTCSheet.cell(lenBTCSheet+1, 16).value = marketamt
+    BTCSheet.cell(lenBTCSheet+1, 17).value = marketper
+    BTCSheet.cell(lenBTCSheet+1, 18).value = nowDatetime
+
+    BTCSheet.cell(lenBTCSheet+1, 19).value = ahncntper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
+    BTCSheet.cell(lenBTCSheet+1, 20).value = ahnamtper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
+    BTCSheet.cell(lenBTCSheet+1, 21).value = ahnttlper
+    BTCSheet.cell(lenBTCSheet+1, 22).value = ahnperper   # BTCfile.xlsx에는 0으로 되어있고 graphfile.xlsx에만 들어간다
+
+    BTCSheet.cell(lenBTCSheet+1, 23).value = BTCdiff
+    BTCSheet.cell(lenBTCSheet+1, 24).value = ahnresult
+    BTCSheet.cell(lenBTCSheet+1, 25).value = result11
+    BTCSheet.cell(lenBTCSheet+1, 26).value = result12
+
+    BTCSheet.cell(lenBTCSheet+1, 27).value = BTCpriceNow
+    BTCSheet.cell(lenBTCSheet+1, 28).value = newBTCavg
+    BTCSheet.cell(lenBTCSheet+1, 29).value = oldBTCavg
+    BTCSheet.cell(lenBTCSheet+1, 30).value = avgdiff
+
+    BTCSheet.cell(lenBTCSheet+1, 31).value = BTCpriceNow
+    BTCSheet.cell(lenBTCSheet+1, 32).value = ttlamt
+    BTCSheet.cell(lenBTCSheet+1, 33).value = ahnttlper
+    BTCSheet.cell(lenBTCSheet+1, 34).value = newmaxBTC
+    BTCSheet.cell(lenBTCSheet+1, 35).value = oldmaxBTC
+    BTCSheet.cell(lenBTCSheet+1, 36).value = newminBTC
+    BTCSheet.cell(lenBTCSheet+1, 37).value = oldminBTC
+    BTCSheet.cell(lenBTCSheet+1, 38).value = maxdiff
+    BTCSheet.cell(lenBTCSheet+1, 39).value = mindiff
+
+    BTCSheet.cell(lenBTCSheet+1, 40).value = BTCpriceNow/100
+    BTCSheet.cell(lenBTCSheet+1, 41).value = ttlamt*3   # 50부근으로
+    BTCSheet.cell(lenBTCSheet+1, 42).value = ahnttlper/3  # 50부근으로
+
+    BTCSheet.cell(lenBTCSheet+1, 43).value = BTCpricediffahn
+    BTCSheet.cell(lenBTCSheet+1, 44).value = BTCdiffahn
+    BTCSheet.cell(lenBTCSheet+1, 45).value = newavgahn
+    BTCSheet.cell(lenBTCSheet+1, 46).value = maxBTCahn
+    BTCSheet.cell(lenBTCSheet+1, 47).value = BTCpriceNow/100
+    BTCSheet.cell(lenBTCSheet+1, 48).value = mn_BTCprice
+    BTCSheet.cell(lenBTCSheet+1, 49).value = mn_ttlamt
+    BTCSheet.cell(lenBTCSheet+1, 50).value = ttlamt
+    BTCSheet.cell(lenBTCSheet+1, 51).value = buyamt5000
+    BTCSheet.cell(lenBTCSheet+1, 52).value = ttlamt5000
+    BTCSheet.cell(lenBTCSheet+1, 53).value = mn_ttlamt5000
+    BTCSheet.cell(lenBTCSheet+1, 54).value = marketcnt5000 #buycnt5000  marketcnt5000
+    BTCSheet.cell(lenBTCSheet+1, 55).value = BTCpriceNow
+    BTCSheet.cell(lenBTCSheet+1, 56).value = mn_BTCprice*100
+    BTCSheet.cell(lenBTCSheet+1, 57).value = marketamt5000
+    BTCSheet.cell(lenBTCSheet+1, 58).value = buyPrice
+    BTCSheet.cell(lenBTCSheet+1, 59).value = sellPrice
+    BTCSheet.cell(lenBTCSheet+1, 60).value = BTCpriceNow
+
+    # ========================================================================================================
+    BTCfile.save('C:/Users/ahnssi9/Desktop/BTCfile.xlsx')
+    BTCfile.close()
+    # ========================================================================================================
+    # ========================================================================================================
+    # 마지막 값이 존재하는 셀(row): sheet.max_row
+    # 마지막 값이 존재하는 셀(column): sheet.max_column
+    # ---------------------------------------------------
+    #  챠트 그려넣어 이메일 보낼 파일 불러오기
+    graphfile = openpyxl.load_workbook(filename="C:/Users/ahnssi9/Desktop/graphfile.xlsx", data_only=True)
+    graphSheet = graphfile['Sheet1']
+    #print("before delete : ",graphSheet.cell(graphSheet.max_row, 1).value)
+    graphSheet.delete_rows(1, graphSheet.max_row + 1)
+    #print("after delete : ",graphSheet.cell(graphSheet.max_row, 1).value)
+    # ----------------------------------------------------
+    # ----------------------------------------------------
+    graphSheet.cell(1, 1).value = 'nowDatetime'
+    graphSheet.cell(1, 2).value = 'BTCpriceNow'
+    graphSheet.cell(1, 3).value = 'BTCprice'
+    graphSheet.cell(1, 4).value = 'BTCdiff'    #'BTCmaxprice'
+    graphSheet.cell(1, 5).value = 'BTCdiffold' #'BTCpricediffold' #'BTCminprice'
+    graphSheet.cell(1, 6).value = 'BTCdiffoldold'
+    graphSheet.cell(1, 7).value = 'nowDatetime'
+    graphSheet.cell(1, 8).value = 'buycnt'
+    graphSheet.cell(1, 9).value = 'sellcnt'
+    graphSheet.cell(1, 10).value = 'nowDatetime'
+    graphSheet.cell(1, 11).value = 'buyamt'
+    graphSheet.cell(1, 12).value = 'sellamt'
+    graphSheet.cell(1, 13).value = 'ttlamt'
+    # ---------------------------------------------------
+    graphSheet.cell(1, 14).value = 'nowDatetime'
+    graphSheet.cell(1, 15).value = 'marketcnt'
+    graphSheet.cell(1, 16).value = 'marketamt'
+    graphSheet.cell(1, 17).value = 'marketper'
+    graphSheet.cell(1, 18).value = 'nowDatetime'
+    graphSheet.cell(1, 19).value = 'ahncntper'
+    graphSheet.cell(1, 20).value = 'ahnamtper'
+    graphSheet.cell(1, 21).value = 'ahnttlper'
+    graphSheet.cell(1, 22).value = 'ahnperper'
+    graphSheet.cell(1, 23).value = 'BTCdiff'
+    graphSheet.cell(1, 24).value = 'ahnresult'
+    graphSheet.cell(1, 25).value = 'result11'
+    graphSheet.cell(1, 26).value = 'result12'
+    graphSheet.cell(1, 27).value = 'BTCpriceNow'
+    graphSheet.cell(1, 28).value = 'newBTCavg'
+    graphSheet.cell(1, 29).value = 'oldBTCavg'
+    graphSheet.cell(1, 30).value = 'old-new'
+    graphSheet.cell(1, 31).value = 'BTCpriceNow'
+    graphSheet.cell(1, 32).value = 'ttlamt'
+    graphSheet.cell(1, 33).value = 'ahnttlper'
+    graphSheet.cell(1, 34).value = 'newmaxBTC'
+    graphSheet.cell(1, 35).value = 'oldmaxBTC'
+    graphSheet.cell(1, 36).value = 'newminBTC'
+    graphSheet.cell(1, 37).value = 'oldminBTC'
+    graphSheet.cell(1, 38).value = 'maxdiff'
+    graphSheet.cell(1, 39).value = 'mindiff'
+    graphSheet.cell(1, 40).value = 'BTCpriceNow'
+    graphSheet.cell(1, 41).value = 'ttlamt'
+    graphSheet.cell(1, 42).value = 'ahnttlper'
+    graphSheet.cell(1, 43).value = '(BTCpriceNow-BTCpriceNowold)'
+    graphSheet.cell(1, 44).value = '(BTCdiff-BTCdiffold)'
+    graphSheet.cell(1, 45).value = '(newBTCavg-newBTCavgold)'
+    graphSheet.cell(1, 46).value = '(newmaxBTC-oldmaxBTC)'
+    graphSheet.cell(1, 47).value = 'BTCpriceNow'
+    graphSheet.cell(1, 48).value = 'mn_BTCprice'
+    graphSheet.cell(1, 49).value = 'mn_ttlamt'
+    graphSheet.cell(1, 50).value = 'ttlamt'
+    graphSheet.cell(1, 51).value = 'buyamt5000'
+    graphSheet.cell(1, 52).value = 'ttlamt5000'
+    graphSheet.cell(1, 53).value = 'mn_ttlamt5000'
+    graphSheet.cell(1, 54).value = 'marketcnt5000'
+    graphSheet.cell(1, 55).value = 'BTCpriceNow'
+    graphSheet.cell(1, 56).value = 'mn_BTCprice'
+    graphSheet.cell(1, 57).value = 'marketamt5000'
+    graphSheet.cell(1, 58).value = 'buyPrice'
+    graphSheet.cell(1, 59).value = 'sellPrice'
+    graphSheet.cell(1, 60).value = 'BTCpriceNow'
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    j = 1
+    # ---------------------------------------------------
+    for i in range(lenBTCSheet - graphcnt + 2, lenBTCSheet + 2):
+        j = j + 1
+        graphSheet.cell(j, 1).value = BTCSheet.cell(i, 1).value
+        graphSheet.cell(j, 2).value = BTCSheet.cell(i, 2).value # BTCpriceNow
+        graphSheet.cell(j, 3).value = BTCSheet.cell(i, 3).value # BTCprice
+        graphSheet.cell(j, 4).value = BTCSheet.cell(i, 4).value # BTCdiff
+        graphSheet.cell(j, 5).value = BTCSheet.cell(i, 5).value # BTCdiffold
+        graphSheet.cell(j, 6).value = BTCSheet.cell(i, 6).value # BTCdiffoldold
+        graphSheet.cell(j, 7).value = BTCSheet.cell(i, 7).value
+        graphSheet.cell(j, 8).value = BTCSheet.cell(i, 8).value
+        graphSheet.cell(j, 9).value = BTCSheet.cell(i, 9).value
+        graphSheet.cell(j, 10).value = BTCSheet.cell(i, 10).value
+        graphSheet.cell(j, 11).value = BTCSheet.cell(i, 11).value
+        graphSheet.cell(j, 12).value = BTCSheet.cell(i, 12).value
+        graphSheet.cell(j, 13).value = BTCSheet.cell(i, 13).value  # ttlamt
+        graphSheet.cell(j, 14).value = BTCSheet.cell(i, 14).value
+        graphSheet.cell(j, 15).value = BTCSheet.cell(i, 15).value  # marketcnt
+        graphSheet.cell(j, 16).value = BTCSheet.cell(i, 16).value  # marketamt
+        graphSheet.cell(j, 17).value = BTCSheet.cell(i, 17).value  # marketper
+        graphSheet.cell(j, 18).value = BTCSheet.cell(i, 18).value
+        graphSheet.cell(j, 19).value = BTCSheet.cell(i, 19).value  # ahncntper
+        graphSheet.cell(j, 20).value = BTCSheet.cell(i, 20).value  # ahnamtper
+        graphSheet.cell(j, 21).value = BTCSheet.cell(i, 21).value  # ahnperper  ahnttlper
+        graphSheet.cell(j, 22).value = BTCSheet.cell(i, 22).value  # ahnperper
+        graphSheet.cell(j, 23).value = BTCSheet.cell(i, 23).value  # BTCdiff
+        graphSheet.cell(j, 24).value = BTCSheet.cell(i, 24).value  # ahnresult
+        graphSheet.cell(j, 25).value = BTCSheet.cell(i, 25).value  # result11
+        graphSheet.cell(j, 26).value = BTCSheet.cell(i, 26).value  # result12
+        graphSheet.cell(j, 27).value = BTCSheet.cell(i, 27).value  # BTCpriceNow
+        graphSheet.cell(j, 28).value = BTCSheet.cell(i, 28).value  # newBTCavg
+        graphSheet.cell(j, 29).value = BTCSheet.cell(i, 29).value  # oldBTCavg
+        graphSheet.cell(j, 30).value = BTCSheet.cell(i, 30).value  # newBTCavg-oldBTCavg
+        graphSheet.cell(j, 31).value = BTCSheet.cell(i, 31).value  # ttlamt
+        graphSheet.cell(j, 32).value = BTCSheet.cell(i, 32).value  # ahnttlper
+        graphSheet.cell(j, 33).value = BTCSheet.cell(i, 33).value  # newmaxBTC
+        graphSheet.cell(j, 34).value = BTCSheet.cell(i, 34).value  # oldmaxBTC
+        graphSheet.cell(j, 35).value = BTCSheet.cell(i, 35).value  # newminBTC
+        graphSheet.cell(j, 36).value = BTCSheet.cell(i, 36).value  # oldminBTC
+        graphSheet.cell(j, 37).value = BTCSheet.cell(i, 37).value  # maxdiff
+        graphSheet.cell(j, 38).value = BTCSheet.cell(i, 38).value  # mindiff
+        graphSheet.cell(j, 39).value = BTCSheet.cell(i, 39).value  # BTCpriceNow
+        graphSheet.cell(j, 40).value = BTCSheet.cell(i, 40).value  # ttlamt
+        graphSheet.cell(j, 41).value = BTCSheet.cell(i, 41).value  # ahnttlper
+        graphSheet.cell(j, 42).value = BTCSheet.cell(i, 42).value  # ahnttlper
+        graphSheet.cell(j, 43).value = BTCSheet.cell(i, 43).value  # ahnttlper
+        graphSheet.cell(j, 44).value = BTCSheet.cell(i, 44).value  # ahnttlper
+        graphSheet.cell(j, 45).value = BTCSheet.cell(i, 45).value  # ahnttlper
+        graphSheet.cell(j, 46).value = BTCSheet.cell(i, 46).value  # ahnttlper
+        graphSheet.cell(j, 47).value = BTCSheet.cell(i, 47).value  # BTCpriceNow
+        graphSheet.cell(j, 48).value = BTCSheet.cell(i, 48).value  # mn_BTCprice
+        graphSheet.cell(j, 49).value = BTCSheet.cell(i, 49).value  # mn_ttlamt
+        graphSheet.cell(j, 50).value = BTCSheet.cell(i, 50).value  # ttlamt
+        graphSheet.cell(j, 51).value = BTCSheet.cell(i, 51).value  # ttlamt
+        graphSheet.cell(j, 52).value = BTCSheet.cell(i, 52).value  # ttlamt
+        graphSheet.cell(j, 53).value = BTCSheet.cell(i, 53).value  # ttlamt
+        graphSheet.cell(j, 54).value = BTCSheet.cell(i, 54).value  # ttlamt
+        graphSheet.cell(j, 55).value = BTCSheet.cell(i, 55).value  # ttlamt
+        graphSheet.cell(j, 56).value = BTCSheet.cell(i, 56).value  # ttlamt
+        graphSheet.cell(j, 57).value = BTCSheet.cell(i, 57).value  # ttlamt
+        graphSheet.cell(j, 58).value = BTCSheet.cell(i, 58).value  # buyPrice
+        graphSheet.cell(j, 59).value = BTCSheet.cell(i, 59).value  # sellPrice
+        graphSheet.cell(j, 60).value = BTCSheet.cell(i, 60).value  # BTCpriceNow
+
+
+    # ---------------------------------------------------
+    graphfile.save('C:/Users/ahnssi9/Desktop/graphfile.xlsx')
+    graphfile.close()
+    #sleep(1)
+    #print(i, lenBTCSheet,"  BTCdiff=", BTCdiff,BTCdiffold," percent 증가율 검토 : cnt=",marketcnt, marketcntold, ahncntper,"  amt=",marketamt, marketamtold, ahnamtper,"  per=",marketper, marketperold, ahnperper)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # ----------------------------------------------------
+    # 상승 경보
+    # --------------------------------------------------------------------
+    def beepup():
+        freq = 500  # range : 37 ~ 32767
+        dur = 1000  # ms
+        #ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # ----------------------------------------------------
+    # 하락 경보
+    # --------------------------------------------------------------------
+    def beepdown():
+        freq = 250  # range : 37 ~ 32767
+        dur = 1000  # ms
+        #ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    def beepupsound():
+        freq = 500  # range : 37 ~ 32767
+        #print('\a')
+        #print('\a')
+        #ws.Beep(500, 1000)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    def beepdownsound():
+        freq = 500  # range : 37 ~ 32767
+        #ws.PlaySound("SystemExclamation", ws.SND_ALIAS)
+        #ws.PlaySound("beep.wav", ws.SND_FILENAME)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    def beepupsoundbest():
+        freq = 500  # range : 37 ~ 32767
+        dur = 1000  # ms
+        ws.Beep(freq, dur)  # winsound.Beep(frequency, duration)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  알림 0-0   buyPrice-sellPrice> 20
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (buyPrice-sellPrice> 10 and buyPrice-sellPrice<-10):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "   =======>알림 0-0   buyPrice-sellPrice> 10   BTCpriceNow=",
+              BTCpriceNow, " buyPrice=", buyPrice, "sellPrice  :  ", sellPrice," buyPrice-sellPrice=",buyPrice-sellPrice)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "      =======>알림 0-0   buyPrice-sellPrice> 20   BTCpriceNow : " + str(
+                BTCpriceNow) + "   buyPrice=" + str(buyPrice) + "   sellPrice=" + str(sellPrice) + "  buyPrice-sellPrice=" + str(buyPrice-sellPrice) + "  \n"
+            f.write(p)
+        # if (now.hour >= 6 and now.hour <= 20):
+        #    print(beepupsound())
+        # -----------------------------------------------
+
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        #  알림 1-1 BTCprice 상승 100
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        if (ttlamt > ahnamt * 2 and ahnamtper > 102 and (BTCpriceNow - mn_BTCprice > updndev * 20)):
+            sleepahn = 60 * 3
+            # ========================================================================================================
+            print(ahndate1, ahndate2, " ttlamt=", ttlamt, " ", ahnamtper, "%     =======>알림 1-1   상승 100 BTCpriceNow=",
+                  BTCpriceNow, " mn_BTCprice=", mn_BTCprice * 100, " > 100  :  ", BTCpriceNow - mn_BTCprice * 100)
+            # ----------------------------------------------------
+            with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+                p = ahndate1 + " " + ahndate2 + " ttlamt=" + str(ttlamt) + " " + str(
+                    ahnamtper) + "%    =======>알림 1-1 상승 100  BTCpriceNow - mn_BTCprice > 100 : " + str(
+                    BTCpriceNow) + " " + str(mn_BTCprice * 100) + " " + str(BTCpriceNow - mn_BTCprice * 100) + "  \n"
+                f.write(p)
+            # if (now.hour >= 6 and now.hour <= 20):
+            #    print(beepupsound())
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        #  알림 1-2 BTCprice 하락 100
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+    if (ttlamt > ahnamt * 2 and ahnamtper>102 and (BTCpriceNow - mn_BTCprice < -updndev*20)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        # ========================================================================================================
+        print(ahndate1, ahndate2," ttlamt=",ttlamt," ", ahnamtper,"%     =======>알림 1-2  하락 100 BTCpriceNow=",BTCpriceNow," mn_BTCprice=",mn_BTCprice*100," < -100  :  ",BTCpriceNow - mn_BTCprice*100 )
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  ttlamt="+str(ttlamt)+" "+str(ahnamtper)+"%  =======>알림 1-2 하락 100 BTCpriceNow - mn_BTCprice < -100 : " + str(BTCpriceNow)+" "+str(mn_BTCprice*100)+" "+str(BTCpriceNow - mn_BTCprice*100) +" \n"
+            f.write(p)
+        # -----------------------------------------------
+        #if (now.hour >= 6 and now.hour <= 20):
+        #    print(beepdownsound())
+        # -----------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  알림 2-1 newBTCavg 상승
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (newBTCavg-newBTCavgold>updndev) and (newBTCavgold-newBTCavgoldold>updndev)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "     =======>알림 2-1 newBTCavg 상승  newBTCavg-newBTCavgold>updndev new:",
+              newBTCavg - newBTCavgold," newold-oldold>updndev ", newBTCavgold - newBTCavgoldold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   =======>알림 2-1 newBTCavg 상승  newBTCavg-newBTCavgold>updndev : " + str(newBTCavg) +" "+ str(
+                newBTCavgold) + " " + str(newBTCavg-newBTCavgold) + " /  newold-oldold>updndev : " + str(newBTCavgold) +" " + str(
+                newBTCavgoldold) + " " + str(newBTCavgold-newBTCavgoldold) + "]" + "  \n"
+            f.write(p)
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+        # -----------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  알림 2-2 newBTCavg 하락
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and (newBTCavg - newBTCavgold <-updndev) and (newBTCavgold - newBTCavgoldold <-updndev)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "      --------------->알림 2-2 newBTCavg 하락 newBTCavg - newBTCavgold <-updndev new:",
+              newBTCavg - newBTCavgold, " newold-oldold>updndev : ", newBTCavgold - newBTCavgoldold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "    --------------->알림 2-2 newBTCavg 하락  newBTCavg - newBTCavgold <-updndev : " + " new" + str(newBTCavg) + " "+ str(
+                newBTCavgold) + " " + str(newBTCavg-newBTCavgold) + "  newoldold <-updndev : " + str(newBTCavgold) + str(
+                newBTCavgoldold) + " " + str(newBTCavgold-newBTCavgoldold) + "]" + "  \n"
+            f.write(p)
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+        # -----------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  알림 2-3 oldBTCavg 상승
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev/2) and (BTCpriceNow-oldBTCavg>updndev/2) and (oldBTCavg - oldBTCavgold > updndev) and (oldBTCavgold - oldBTCavgoldold > updndev)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "     =======>알림 2-3 oldBTCavg 상승 >updndev  old:",
+               oldBTCavg - oldBTCavgold, " old-oldold>updndev ", oldBTCavgold - oldBTCavgoldold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   =======>알림 2-3 oldBTCavg 상승 newBTCavg 상승 >updndev : " + " " + str(
+                oldBTCavg) + " " + str(oldBTCavgold) + " " + str(oldBTCavg - oldBTCavgold) + " / oldold >updndev : " + str(
+                oldBTCavgold) + " " + str(oldBTCavgoldold) + " " + str(oldBTCavgold - oldBTCavgoldold) + "  \n"
+            f.write(p)
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+        # -----------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  알림 2-4 oldBTCavg 하락
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev/2) and (BTCpriceNow-oldBTCavg<-updndev/2) and (oldBTCavg-oldBTCavgold<-updndev) and (oldBTCavgold-oldBTCavgoldold<-updndev)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "      --------------->알림 2-4 oldBTCavg 하락 <-updndev old:",
+                oldBTCavg - oldBTCavgold," old-oldold<-updndev ",   oldBTCavgold - oldBTCavgoldold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "    --------------->알림 2-4 oldBTCavg 하락 <-updndev " + " " + str(
+                oldBTCavg) + " " + str(oldBTCavgold) + " " + str(oldBTCavg-oldBTCavgold) + " / oldold <-updndev : " + str(
+                oldBTCavgold) + " " + str(oldBTCavgoldold) + " " + str(oldBTCavgold-oldBTCavgoldold) + "  \n"
+            f.write(p)
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+        # -----------------------------------------------
+    # ------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 3-1  최근10일간의 최대치와 최소치 차이가 50을 넘으면 급변
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (newmaxBTC-oldmaxBTC>updndev*5)):
+        sleepahn = 60 * 10
+        # ========================================================================================================
+        print(ahndate1, ahndate2," =======>알림 3-1   최근10일간의 최대치와 차이  newmaxBTC-oldmaxBTC>updndev*5 : ", newmaxBTC-oldmaxBTC)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  =======>알림 3-1   최근10일간의 최대치와 최소치 차이    newmaxBTC-oldmaxBTC>updndev*5 : " + str(newmaxBTC-oldmaxBTC)+"  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 3-2  최근10일간의 최대치와 최소치 차이가 50을 넘으면 급변
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and (newminBTC-oldminBTC<-updndev*5)):
+        sleepahn = 60 * 10
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "      --------------->알림 3-2   최근10일간의 최소치 차이   newminBTC-oldminBTC<-updndev*5 : ", newminBTC-oldminBTC)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   --------------->알림 3-2   최근10일간의 최대치와 최소치 차이    newminBTC-oldminBTC<-updndev*5 : " + str(
+                newminBTC-oldminBTC) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 4-1  길게 보는 상승장 시작 BTCpriceNow-BTCprice>5
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (BTCpriceNow-BTCprice>updndev) and (BTCpriceNowold-BTCpriceold<-updndev)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "     =======>알림 4-1  길게 보는 상승장 시작 BTCpriceNow-BTCprice>updndev  :  ", BTCpriceNow-BTCprice,
+              "    BTCpriceNowold-BTCpriceold<-updndev : ", BTCpriceNowold-BTCpriceold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  =======>알림 4-1  길게 보는 상승장 시작 BTCpriceNow-BTCprice>updndev    BTCpriceNow=" + str(
+                BTCpriceNow) + " "+ str(BTCprice) + " "+ str(BTCpriceNow-BTCprice) + "    BTCpriceNowold-BTCpriceold<-updndev : " + str(BTCpriceNowold)+" "+str(BTCpriceold)+" "+ str(BTCpriceNowold-BTCpriceold) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 4-2 길게 보는 하락장 시작 BTCpriceNow-BTCprice<-5
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and (BTCpriceNow-BTCprice<-updndev) and (BTCpriceNowold-BTCpriceold>updndev)):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "      --------------->알림 4-2  길게 보는 하락장 시작 BTCpriceNow-BTCprice<-updndev  :  ", BTCpriceNow-BTCprice,
+              "    BTCpriceNowold-BTCpriceold>10 : ",   BTCpriceNowold-BTCpriceold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   --------------->알림 4-2  길게 보는 하락장 시작 BTCpriceNow-BTCprice<-updndev    BTCpriceNow=" + str(
+                BTCpriceNow)+ " " + str(BTCprice)+ " " + str(BTCpriceNow-BTCprice) + "    BTCpriceNowold-BTCpriceold>updndev0 : " + str(BTCpriceNowold)+" "+str(BTCpriceold)+" "+ str(BTCpriceNowold-BTCpriceold) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        # ----------------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 5-1 변곡좀 상승 시작 예상
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and BTCdiff - BTCahn > updndev*2 and BTCdiffold - BTCahn < -updndev):
+        sleepahn = 60 * 3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "    =======> 알림 5-1 변곡점 상승 시작   BTCdiff - BTCahn > updndev*2 :", BTCdiff - BTCahn, "    BTCdiffold - BTCahn < -updndev :", BTCdiffold - BTCahn)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  =======>알림 5-1 변곡점 상승 시작      BTCdiff - BTCahn > updndev*2 : " + str(BTCdiff - BTCahn) + "    BTCdiffold - BTCahn < -updndev : " + str(
+                BTCdiffold - BTCahn) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 5-2  변곡좀 하락 시작 예상
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and BTCdiff-BTCahn < -updndev*2 and BTCdiffold-BTCahn > updndev):
+        sleepahn = 60*3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "   --------------->알림 5-2 변곡점 하락 시작  < -updndev*2  BTCdiff=", BTCdiff - BTCahn, "    BTCdiffold> updndev ", BTCdiffold - BTCahn)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   --------------->알림 5-2 변곡점 하락 시작   < -updndev*2   BTCdiff=" + str(BTCdiff - BTCahn) + "    BTCdiffold> updndev " + str(
+                BTCdiffold - BTCahn) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 6-1 계속 상승
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (BTCdiff-BTCdiffold > updndev) and (BTCdiffold-BTCdiffoldold >= updndev*2)):
+        sleepahn = 60*3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "    =======> 알림 6-1  계속 상승    BTCdiff-BTCdiffold>updndev : ", BTCdiff - BTCdiffold, "    BTCdiffold-BTCdiffoldold>updndev*2 : ",
+              BTCdiffold - BTCdiffoldold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  =======>알림 6-1  계속 상승    BTCdiff-BTCdiffold>updndev : "+ str(BTCdiff - BTCdiffold) + "    BTCdiffold-BTCdiffoldold>updndev*2 : " + str(BTCdiffold - BTCdiffoldold) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 6-2 계속 하락
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and (BTCdiff-BTCdiffold < -updndev) and (BTCdiffold-BTCdiffoldold < -updndev*2)):
+        sleepahn = 60*3
+        # ========================================================================================================
+        print(ahndate1, ahndate2, "     --------------->알림 6-2  계속 하락   BTCdiff-BTCdiffold<-updndev : ", BTCdiff - BTCdiffold, "    BTCdiffold-BTCdiffoldold<-updndev*2 : ",BTCdiffold - BTCdiffoldold)
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   --------------->알림 6-2 계속 하락    BTCdiff-BTCdiffold<-updndev : " + str(BTCdiff - BTCdiffold) + "    BTCdiffold-BTCdiffoldold<-updndev*2 : "  + str(BTCdiffold - BTCdiffoldold) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 7-1
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (marketcnt >= 100 and ahncntper >= 100.1 and marketamt >= 200 and ahnamtper >= 100.1 and marketper >= 300 and ahnperper >= 110)):
+        sleepahn = 60*3
+        print(ahndate1, ahndate2,
+              " =======>알림 7-1 추세  ((marketcnt >= ttlamtahn  marketper >= 100.1 and  --->>>  cnt(", marketcnt,
+              " ", marketcntold, " ", ahncntper, ") amt=(", marketamt, " ", marketamtold, " ", ahnamtper,
+              "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T>200 :", ttlamt, " ", ahnttlper, ahnresult)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + " =======>알림 7-1 추세  cnt(" + str(marketcnt) + " " + str(
+                marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
+                marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
+                marketperold) + "% " + str(ahnperper) + "%)  >=200 : " + str(ttlamt) + " " + str(
+                ahnttlper) + "%) " + str(ahnresult) + "% \n"
+            f.write(p)
+            # -----------------------------------------------
+        # ----------------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 7-2
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50)):
+        sleepahn = 60*3
+        print(ahndate1, ahndate2,
+              "  --------------->알림 7-2 추세  ((marketcnt >= ttlamtahn  marketper >= 100.1 and  --->>>  cnt(", marketcnt,
+              " ", marketcntold, " ", ahncntper, ") amt=(", marketamt, " ", marketamtold, " ", ahnamtper,
+              "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T>200 :", ttlamt, " ", ahnttlper, ahnresult)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  --------------->알림 7-2 추세  cnt(" + str(marketcnt) + " " + str(
+                marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
+                marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
+                marketperold) + "% " + str(ahnperper) + "%)  >=200 : " + str(ttlamt) + " " + str(
+                ahnttlper) + "%) " + str(ahnresult) + "% \n"
+            f.write(p)
+            # -----------------------------------------------
+        # ----------------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 8
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (marketcnt >= 100 and ahncntper >= 120.1 and marketamt >= 300 and ahnamtper >= 120.1 and marketper >= 400 and ahnperper >= 120.1)
+            and (BTCdiff-BTCahn > updndev*2 and BTCdiffold-BTCahn < -updndev*2)):
+        sleepahn = 60*1
+        # ----------------------------------------------------
+        print(ahndate1, ahndate2, " =======>알림 8 상승 **행동 개시** 추세  300 500 500 100.1 BTCdiff > 10 cnt(",
+              marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
+              "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
+              "%) BTCdiff=(", BTCdiff - BTCahn, BTCdiffold - BTCahn, BTCdiffoldold - BTCahn, ") ", ahnresult)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  =======>알림 8 상승  **행동 개시** 추세  300 500 200 100.1 BTCdiff > 10 cnt(" + str(
+                marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
+                marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
+                marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
+                ahnttlper) + "%) (" + str(BTCdiff - BTCahn) + " " + str(BTCdiffold - BTCahn) + "  " + str(
+                BTCdiffoldold - BTCahn) + "  " + str(
+                ahnresult) + "% \n"
+            f.write(p)
+            # -----------------------------------------------
+       # ----------------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+        # ----------------------------------------------------
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 9
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold>updndev) and (marketcnt >= 100 and ahncntper >= 120.1 and marketamt >= 300 and ahnamtper >= 120.1 and marketper >= 400 and ahnperper >= 120.1)
+       and (BTCdiff-BTCahn > updndev and BTCdiffold-BTCahn > updndev)):
+        sleepahn = 60 * 3
+        # ----------------------------------------------------
+        print(ahndate1, ahndate2, " =======>알림 9 상승 **행동 개시** 추세  300 500 500 100.1 BTCdiff > 10 cnt(",
+              marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
+              "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
+              "%) BTCdiff=(", BTCdiff - BTCahn, BTCdiffold - BTCahn, BTCdiffoldold - BTCahn, ") ", ahnresult)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "  =======>알림 9 상승  **행동 개시** 추세  300 500 200 100.1 BTCdiff > 10 cnt(" + str(
+                marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(
+                marketamt) + "% " + str(
+                marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
+                marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
+                ahnttlper) + "%) (" + str(BTCdiff - BTCahn) + " " + str(BTCdiffold - BTCahn) + "  " + str(
+                BTCdiffoldold - BTCahn) + "  " + str(
+                ahnresult) + "% \n"
+            f.write(p)
+        # ----------------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsound())
+            print(beepupsoundbest())
+        # ----------------------------------------------------
+
+    # --------------------------------------------------------------------
+    #
+    # --------------------------------------------------------------------
+
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 알림 10
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow-BTCpriceNowold<-updndev) and (marketcnt <= 50 and ahncntper <= 50 and marketamt <= 50 and ahnamtper <= 50 and marketper <= 50 and ahnperper <= 50)
+            and (BTCdiff-BTCahn < -updndev and BTCdiffold-BTCahn <-updndev)):
+        sleepahn = 60*3
+        # ----------------------------------------------------
+        print(ahndate1, ahndate2, " --------------->알림 10 하락  **행동 개시** 추세  300 500 200 102 BTCdiff > 10 cnt(",
+              marketcnt, " ", marketcntold, ")", ahncntper, " amt=(", marketamt, "%", marketamtold, "%", ahnamtper,
+              "%) T(", marketper, "%", marketperold, "%", ahnperper, "%)  T:", ttlamt, " ", ahnttlper,
+              "%) BTCdiff=(", BTCdiff - BTCahn, BTCdiffold - BTCahn, BTCdiffoldold - BTCahn, ") ", ahnresult)
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   --------------->알림 10 하락  **행동 개시** 추세  300 500 500 102 BTCdiff > 10 cnt(" + str(
+                marketcnt) + " " + str(marketcntold) + " " + str(ahncntper) + ")% amt( " + str(marketamt) + "% " + str(
+                marketamtold) + "% " + str(ahnamtper) + "%) T:(" + str(marketper) + "% " + str(
+                marketperold) + "% " + str(ahnperper) + "%) " + str(ttlamt) + " " + str(
+                ahnttlper) + "%) (" + str(BTCdiff - BTCahn) + " " + str(BTCdiffold - BTCahn) + "  " + str(
+                BTCdiffoldold - BTCahn) + "  " + str(
+                ahnresult) + "% \n"
+            f.write(p)
+            # -----------------------------------------------
+        # ----------------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepdownsound())
+            print(beepdownsound())
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  알림 1-1 ttlamt 상승  ahnttlper 상승
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10):  #반드시 250이상
+        sleepahn = 60 * 10
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # if (ttlamt>ahnamt*ahn10  and ahnttlper>101):  #반드시 250이상 101이상
+    if (ttlamt > ahnamt*ahn10 and (BTCpriceNow - mn_BTCprice > updndev * 1)):
+        sleepahn = 60 * 30
+        print(ahndate1, ahndate2,
+              "    >> 알림 mn_1    ttlamt = ",
+              ttlamt, "  ahnamt =",  ahnamt, " BTCpriceNow-BTCpriceNowold>updndev :", BTCpriceNow, mn_BTCprice,
+              BTCpriceNow - mn_BTCprice)
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "    >>>  알림 mn_1     if (ttlamt>mn_ttlamt  and BTCpriceNow-mn_BTCprice>updndev):   ttlamt = " + str(
+                ttlamt) + "   mn_ttlamt=" + str(mn_ttlamt) + " " + str(BTCpriceNow) + " " + str(
+                mn_BTCprice) + " " + str(BTCpriceNow - mn_BTCprice) + "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsoundbest())
+        # ----------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and ahnttlper>105 and (BTCpriceNow-BTCpriceNowold>updndev*1)):
+        sleepahn = 60 * 1
+        print("========================================================================================================")
+        print("========================================================================================================")
+        print(ahndate1, ahndate2, "     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 알림 1-1     if (ttlamt>ahnamt  and ahnttlper>101 and (BTCpriceNow-BTCpriceNowold>updndev) ):   ttlamt = ",ttlamt," ahnttlper =",ahnttlper, " BTCpriceNow-BTCpriceNowold>updndev :", BTCpriceNow,BTCpriceNowold,BTCpriceNow - BTCpriceNowold)
+        print("========================================================================================================")
+        print("========================================================================================================")
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  알림 1-1     if (ttlamt>ahnamt  and ahnttlper>101):   ttlamt = "+str(ttlamt)+"   ahnttlper="+str(ahnttlper) + " " + str(BTCpriceNow)+ " " + str(BTCpriceNowold)+ " " + str(BTCpriceNow-BTCpriceNowold)+ "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsoundbest())
+        # ----------------------------------------------------
+    #
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # -------- 알림 0-0  (BTCdiff - BTCahn) > updndev and (BTCdiff - BTCdiffold > updndev)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    if (ttlamt > ahnamt*ahn10 and ahnttlper>105 and (BTCpriceNow-BTCpriceNowold>updndev*4) and (newBTCavg-newBTCavgold>updndev*4) and  (newmaxBTC-oldmaxBTC>updndev*4)  and (BTCdiff-BTCdiffold > updndev*4)):
+        sleepahn = 60 * 1
+        print("========================================================================================================")
+        print("========================================================================================================")
+        print(ahndate1, ahndate2, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> 알림 0-0   ttlamt = [", ttlamt, ahnttlper, "%]  Now[", BTCpriceNow, BTCprice, BTCdiff - BTCahn, "] )", BTCdiffold - BTCahn, BTCdiff - BTCdiffold,
+             " avg{", newBTCavg, newBTCavgold,oldBTCavg, oldBTCavgold, avgdiff, "} max(", newmaxBTC, oldmaxBTC, maxdiff, ") min(", newminBTC, oldminBTC,
+              mindiff)
+        print("========================================================================================================")
+        print("========================================================================================================")
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  알림 0-0  T[" + str(ttlamt) + " " + str(ahnttlper) + "%] Now[" + str(
+                BTCpriceNow) + " " + str(BTCpriceNowold) + " " + str(BTCpriceNow - BTCpriceNowold) + "][" + str(
+                BTCprice) + " " + str(BTCdiff - BTCahn) + "] <" + str(BTCdiff - BTCdiffold) + ">  avg{" + str(
+                newBTCavg) + " " + str(oldBTCavg) + " " + str(avgdiff) + "} max(" + str() + " " + str(oldmaxBTC
+                ) + ") min(" + str(newminBTC) + " " + str(oldminBTC)+ "  \n"
+            f.write(p)
+        # -----------------------------------------------
+        if (now.hour >= 6 and now.hour <= 20):
+            print(beepupsoundbest())
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # ----------------------------------------------------
+        # 메일 보내기
+        # --------------------------------------------------------------------
+        # --------------------------------------------------------------------
+        name = "ahnsangkoo"
+        emailid = "ahnssi9@hanmail.net"
+
+        # 제목, 본문 작성
+        msg = MIMEMultipart()
+        msg['Subject'] =  " >>>>>>>>>>>>>  알림 0-0  T[" + str(ttlamt) + " " + str(ahnttlper) + "%] Now[" + str(
+                BTCpriceNow) + " " + str(BTCpriceNowold) + " " + str(BTCpriceNow - BTCpriceNowold)
+        msg.attach(MIMEText('  내 삶의 행복한 순간  ', 'plain'))
+
+        # 파일첨부 (파일 미첨부시 생략가능)
+        attachment = open('C:/Users/ahnssi9/Desktop/graphfile.xlsx', 'rb')
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment', filename=('UTF-8', '', 'graphfile.xlsx'))
+        msg.attach(part)
+
+        # 세션생성, 로그인
+        smtpserver = 'smtp.gmail.com:587'
+        s = smtplib.SMTP(smtpserver)
+        s.starttls()
+        s.login('ahnssi98@gmail.com', 'fcwwkgkglatjqwhx')
+
+        # 메일 전송
+        s.sendmail("   Center", emailid, msg.as_string())
+        s.quit()
+        # ----------------------------------------------------
+        # print(ahndate1 ,ahndate2 ,"  ---------------> 메일보내기   marketper  = ",marketper,"%    ahnresult   : ",ahnresult,"%     " ,result11,result12," ",name,  emailid + ' \n')
+        # ----------------------------------------------------
+        with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+            p = ahndate1 + " " + ahndate2 + "   ---------------> 메일보내기   >>>>>>>>>>>>>  알림 0-0  T[" + str(ttlamt) + " " + str(ahnttlper) + "%] Now[" + str(
+                BTCpriceNow) + " " + str(BTCpriceNowold) + " " + str(BTCpriceNow - BTCpriceNowold) + " \n"
+            f.write(p)
+        # -----------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    #  lengraphSheet 아용하여 각종 자료 출력하기
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    #print(ahndate1,ahndate2," (", BTCpriceNow,BTCprice,BTCmaxprice, BTCminprice, ")(",BTCdiff,BTCdiffold,BTCdiffoldold,(BTCdiffold-BTCdiffoldold),") cnt(", buycnt,
+    #print(ahndate1, ahndate2,"BTC:",lenBTCSheet,"<",ttlline,len(dict),"-",tidcnt,"=",len(dict)-tidcnt,"> T[",ttlamt,ahnperper,"%] (", BTCpriceNow,BTCpricediff,")(", BTCprice, BTCdiff, ") cnt(", buycnt,"/", sellcnt,marketcnt,ahncntper,"%) amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%) T(" ,marketper,ahnperper,"%)",ahnresult,result11,result12)
+    #print(ahndate1, ahndate2,"<",len(dict),tidcnt,">T[",ttlamt,ahnperper,"%]avg{",newBTCavg,newBTCavgold,oldBTCavg,oldBTCavgold,avgdiff,"} max(",newmaxBTC,oldmaxBTC,maxdiff,") min(",newminBTC,oldminBTC,mindiff,") Now[", BTCpriceNow,BTCprice,BTCdiff-BTCahn,"]",BTCdiffold-BTCahn,BTCdiffoldold-BTCahn,"/",BTCdiff-BTCdiffold,BTCdiffold-BTCdiffoldold, ")cnt(", buycnt,"/", sellcnt,marketcnt,ahncntper,"%)amt(", buyamt, "/", sellamt,marketamt,ahnamtper, "%)T(" ,marketper,ahnperper,"%)",ahnresult,result11,result12)
+    # ---------------------------------------------------
+    #print(ahndate1, ahndate2, len(dict), tidcnt, "(", mn_ttlamt, ttlamt, ahnperper, ") N[", mn_BTCprice * 100,
+    print(ahndate1, ahndate2, " [", buyPrice, sellPrice,"b-s=",buyPrice-sellPrice,"*",BTCpriceNow,
+          "](", mn_ttlamt, ttlamt, ahnamtper,marketamt,marketcnt, ") N[", mn_BTCprice * 100,
+          BTCpriceNow, BTCpriceNowold, BTCpriceNow - BTCpriceNowold, "] amt(",
+          buyamt, "/", sellamt, marketamt, ahnamtper, "%)T(", marketper, ahnperper, "%)  cnt(", buycnt, "/", sellcnt, marketcnt, ahncntper, "%) [", BTCprice, BTCdiff - BTCahn,
+          BTCdiff - BTCdiffold, "] Av", newBTCavg, oldBTCavg, "<", avgdiff, "> Mx", newmaxBTC, oldmaxBTC, "<", maxdiff,
+          "> Mn", newminBTC, oldminBTC, "<", mindiff, "> ", ahnresult, result11, result12)
+
+    # ---------------------------------------------------
+    with open("C:/Users/ahnssi9/Desktop/BTCtxt.txt", mode="a", encoding="cp949") as f:
+        #p = ahndate1+" "+ ahndate2+" BTC:"+str(lenBTCSheet) + "<" +str(ttlline)+" "+str(len(dict))+"-"+str(tidcnt)+"="+str(len(dict)-tidcnt)+"> T["+str(ttlamt)+ str(ahnttlper)+"%] (" + str(BTCpriceNow) + " " + str(BTCpricediff)+") ("+ " "+ str(BTCprice) +  str(BTCdiff)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+        #p=ahndate1 + " " + ahndate2+" <" + str(
+        #        len(dict)) +" "+str(tidcnt)+"> " + str(lenBTCSheet)+ " T[" + str(ttlamt) +" "+ str(
+        #        ahnttlper) + "%] avg{"+str(newBTCavg) + " "+str(newBTCavgold)+" "+str(oldBTCavg)+" "+" "+str(oldBTCavgold)+" "+str(avgdiff) + "} max("+str(oldmaxBTC)+" "+str(newmaxBTC)+") min("+str(oldminBTC)+" "+str(newminBTC)+") Now["+str(BTCpriceNow) +" " + str(BTCprice)+" " + str(BTCdiff-BTCahn)+"] "+ str(BTCdiffold-BTCahn)+" "+str(BTCdiffoldold-BTCahn)+"/"+str(BTCdiff-BTCdiffold)+" "+str(BTCdiffold-BTCdiffoldold)+ ") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+        #        marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)  T%=(" + str(marketper)+ " " + str(ahnperper) + "%)   <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
+        #p = ahndate1+" "+ ahndate2+" BTC:"+str(lenBTCSheet) + "<" +str(ttlline)+" "+str(len(dict))+"-"+str(tidcnt)+"="+str(len(dict)-tidcnt)+"> T["+str(ttlamt)+ str(ahnttlper)+"%] (" + str(BTCpriceNow) + " " + str(BTCpricediff)+") ("+ " "+ str(BTCprice) +  str(BTCdiff)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+        p=ahndate1 + " " + ahndate2+" <" +"[b="+str(buyPrice)+"s="+str(sellPrice)+" b-s="+str(buyPrice-sellPrice)+ "*"+str(BTCpriceNow)+"] "+str(
+                len(dict)) +" "+str(tidcnt)+"> " + str(lenBTCSheet)+ " T[" + str(mn_ttlamt) +" " + str(ttlamt) +" "+ str(ahnamtper) + "%"+ str(ahnttlper) + "%] Now["+str(mn_BTCprice*100) +" "+str(BTCpriceNow) +" " +str(BTCpriceNowold) +" "+str(BTCpriceNow-BTCpriceNowold) +"]["  + str(BTCprice)+" " + str(BTCdiff-BTCahn)+" "+str(BTCdiff-BTCdiffold)+ "] avg{"+str(newBTCavg) +" "+str(oldBTCavg)+" "+str(avgdiff) + "} max("+str(oldmaxBTC)+" "+str(newmaxBTC)+") min("+str(oldminBTC)+" "+str(newminBTC)+") cnt(" + str(buycnt) + "/" + str(sellcnt) + " " + str(
+                marketcnt)  + " " + str(ahncntper) + "%)  amt(" + str(buyamt) + "/" + str(sellamt) + " " + str(marketamt)+ " " + str(ahnamtper) + "%)  T%=(" + str(marketper)+ " " + str(ahnperper) + "%)   <" + str(ahnresult) + "% " + result11 + " " +  result12 + ">  \n"
+        f.write(p)
+    #
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 00
+    # ------------------------------------------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    graphfile = openpyxl.load_workbook(filename="C:/Users/ahnssi9/Desktop/graphfile.xlsx", data_only=True)
+    graphSheet = graphfile['Sheet1']
+    # print(" graphSheet -->갯수 : ",len(graphSheet['A']))
+    lengraphSheet = len(graphSheet['A'])
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'ttlamt ahnttlper'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 45
+    chartData = Reference(graphSheet, min_col=51, min_row=(lengraphSheet) - graphcnt, max_col=57,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt + 1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A15')
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 10
+    # ------------------------------------------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'ttlamt ahnttlper'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 45
+    chartData = Reference(graphSheet, min_col=43, min_row=(lengraphSheet) - graphcnt, max_col=47,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt + 1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A31')
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 11
+    # ------------------------------------------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'ttlamt ahnttlper'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 45
+    chartData = Reference(graphSheet, min_col=40, min_row=(lengraphSheet) - graphcnt, max_col=42,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt + 1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A21')
+    # ----------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 12
+    # ------------------------------------------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'avg BTC price'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 41
+    chartData = Reference(graphSheet, min_col=27, min_row=(lengraphSheet) - graphcnt, max_col=29,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 1, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet)-graphcnt+1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A27')
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    #  챠트 그려넣기 13
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------
+    # 차트 초기화
+    # -----------------------
+    # -----------------------
+    chart = LineChart()
+    # -----------------------------------------------
+    # -----------------------------------------------
+    #chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'BTC PRICE'
+
+    # ------ 가격
+    # ------CHARtDATA B1-E1 (2,1)-(5,1)
+    # ------CATEGORY(일시) A1-A41 (1,1)-(1,41)
+    # --------------------------------------------------------------------
+    # chartData  BTC 가격 B1:E41  min_col = 2,min_row = 1,(B1) max_col = 6 , max_row = 41(E41) )
+    chartData = Reference(graphSheet, min_col=2, min_row=(lengraphSheet) - graphcnt, max_col=4, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시 A2 :A41  min_col = 1, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet)-graphcnt+1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # -------------------------------------------------------------------
+    # ----------------------------------------------------
+    # 중간중간 꾸미기 글자키우기 색상 넣기 등
+    # --------------------------------------------------------------------
+    for row in graphSheet['F2:F25']:
+        for cell in row:
+            cell.border = border_thin
+            cell.number_format = '0.00'
+
+    for row in graphSheet['C2:C25']:
+        for cell in row:
+            cell.alignment = align_vcenter
+            cell.fill = fill_lightgrey
+
+    for row in graphSheet['B2:B25']:
+        for cell in row:
+            cell.alignment = align_vcenter
+            cell.fill = fill_orange
+    # ----------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A31')
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 14
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'ttlamt ahnttlper'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 41
+    chartData = Reference(graphSheet, min_col=34, min_row=(lengraphSheet) - graphcnt, max_col=37,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet)-graphcnt+1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A37')
+    # ------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 15
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'Buyprice Sellprice'
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    chartData = Reference(graphSheet, min_col=58, min_row=(lengraphSheet) - graphcnt, max_col=60,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt + 1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A47')
+    # ------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 21
+    # ------------------------------------------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'BUY/SELL CNT'
+    # --------------------------------------------------------------------
+    # ------BUYCNT-SELLCNT
+    # ------CHARDATA K1-M41 (11,1) - (13,41)
+    # ------CATEGORY(일시) J1-J41  (10,1)-(10,41)
+    # ------BUYCNT
+    # ------CHARDATA H1-I41 (8,1) - (9,41)
+    # ------CATEGORY(일시) G1-G41 (7,1)-(7,41)
+    # --------------------------------------------------------------------
+    # chartData  BUY CNT H1:I41  min_col = 8,min_row = 1,(H1) max_col = 9 , max_row = 41(I41) )
+    chartData = Reference(graphSheet, min_col=8, min_row=(lengraphSheet) - graphcnt, max_col=9, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시 A2 :A41  min_col = 1, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet)-graphcnt+1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'K21')
+    # ------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 22
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'BUY/SELL AMT'
+    # --------------------------------------------------------------------
+    # ------BUYAMT-TTLAMT
+    # ------CHARDATA K1-M41 (11,1) - (13,41)
+    # ------CATEGORY(일시) J1-J41  (10,1)-(10,41)
+
+    # --------------------------------------------------------------------
+    # chartData  BUYAMT-TTLAMT K1-M41  min_col = 11,min_row = 1,(k1) max_col = 13 , max_row = 41(M41) )
+    chartData = Reference(graphSheet, min_col=11, min_row=(lengraphSheet) - graphcnt, max_col=13,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시 J1-J41  min_col = 1, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet)-graphcnt+1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'K27')
+    # --------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 23
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'MARTKET_PERCENT'
+    # --------------------------------------------------------------------
+    # ------MARTKETPERCENT
+    # ------CHARDATA O1-Q41 (15,1) - (17,41)
+    # ------CATEGORY(일시) N1-N41 (14,1) - (14,41)
+
+    # --------------------------------------------------------------------
+    # chartData  MARTKETPERCENT O1-Q41  min_col = 15,min_row = 1,(O1) max_col = 17 , max_row = 41(Q41) )
+    chartData = Reference(graphSheet, min_col=15, min_row=(lengraphSheet) - graphcnt, max_col=17,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  N1-N41  min_col = 1, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet)-graphcnt+1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'A3')
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 24
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'ahnper'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 41
+    chartData = Reference(graphSheet, min_col=19, min_row=(lengraphSheet) - graphcnt, max_col=22,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 1, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt + 1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'k3')
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #  챠트 그려넣기 10
+    # ------------------------------------------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ----------------------------------------------------
+    # print("------LineChart 챠트그리기 시작 ---------------------")
+    # 차트 초기화
+    # chart = Barchart()
+    chart = LineChart()
+    # chart.title = name + " 스토리지 [" + storageno + "] CFX 보상량"
+    chart.x_axis.title = '2022년'
+    chart.y_axis.title = 'ttlamt ahnttlper'
+    # --------------------------------------------------------------------
+    # ------ahnper
+    # ------CHARDATA S1-X41 (19,1) - (23,41)
+    # ------CATEGORY(일시) R1-R41 (18,1) - (18,41)
+
+    # --------------------------------------------------------------------
+    # chartData  ahnper S1-X41 (19,1) - (23,41)  min_col = 19,min_row = 1, max_col = 22 , max_row = 45
+    chartData = Reference(graphSheet, min_col=47, min_row=(lengraphSheet) - graphcnt, max_col=50,
+                          max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    # category  ---> x축 날짜 표시  R1-R41  min_col = 18, 	min_row=2, max_row=41
+    # --------------------------------------------------------------------
+    category = Reference(graphSheet, min_col=1, min_row=(lengraphSheet) - graphcnt + 1, max_row=(lengraphSheet))
+    # --------------------------------------------------------------------
+    #  category ---> y축 간격은 자동으로 계산됨
+    # --------------------------------------------------------------------
+    chart.add_data(chartData, titles_from_data=True)  # title_from_data는 범례 값
+    chart.set_categories(category)
+    # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
+    # 완성된 챠트를 그리기
+    # -----------------------------------------------
+    graphSheet.add_chart(chart, 'K41')
+    # --------------------------------------------------------------
+    # -----------------------------------------------
+    # print("------챠트완성하여 graphfile.xlsx 저장 ---------------------")
+    # ----------------------------------------------------
+    graphfile.save('C:/Users/ahnssi9/Desktop/graphfile.xlsx')
+    graphfile.close()
+    # ---------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # -----------------------------------------------
+    # ---------------------------------------------------
+    # -----------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------
+
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ---------------------------------------------------
+    # ------------------------------------------------------------------------------------
+    #print(sleepahn)
+    # ------------------------------------------------------------------------------------
+    if (sleepahn == 0):
+        if (now.hour >= 7 and now.hour <= 20):
+           sleepsec = 1800 #30분
+        else:
+           sleepsec = 3600  #1시간
+    #else:
+    #        sleepsec = sleepahn
+    # ----------------------------------------------------
+    if (now.hour >= 7 and now.hour <= 20):
+        sleepsec = 1800  # 30분
+    else:
+        sleepsec = 3600  # 1시간
+    #sleepsec = 60*1
+    sleepsec = 3600
+    sleep(sleepsec)
+    sleepahn = 1800
+    # --------------------------------------------------------------------
